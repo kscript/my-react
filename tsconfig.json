@@ -1,7 +1,8 @@
 {
+  "esModuleInterop": true,
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es5",
+    "module": "es5",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
@@ -17,13 +18,16 @@
       "chai"
     ],
     "paths": {
-        "*": ["types/*"],
+      "*": [
+        "types/*"
+      ],
       "@/*": [
         "src/*"
       ]
     },
     "lib": [
       "esnext",
+      "es5",
       "dom",
       "dom.iterable",
       "scripthost"
@@ -34,7 +38,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx", "src/server.ts"
+    "tests/**/*.tsx",
+    "src/server.ts",
+    "types/acorn-jsx.d.ts"
   ],
   "exclude": [
     "node_modules"
