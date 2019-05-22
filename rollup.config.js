@@ -12,7 +12,9 @@ export default {
             "target": "es5",
             "sourceMap": false
         }),
-        jsx({factory: 'React.createElement'}),
+        jsx({
+            factory: 'React.createElement'
+        }),
         // babel()
     ]
 };

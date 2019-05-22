@@ -1,22 +1,18 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 var Babel = require('@babel/parser');
 var Acorn = require('acorn');
-var Generate = _interopDefault(require('@babel/generator'));
+require('@babel/generator');
 require('acorn-jsx');
 
 var acorn = Acorn;
 var babel = Babel;
-var generate = Generate;
 
 var Parser = acorn.Parser, Node = acorn.Node;
 var parse = babel.parse;
 var rid = 1;
-var createElement = function (el, opt, content) {
-    // console.log(el, opt, content);
-    return generate(el, Object.assign({}, opt), content);
+var createElement = function (type, config, children) {
+    console.log(type, config, children);
 };
 var Component = /** @class */ (function () {
     function Component() {
@@ -44,7 +40,7 @@ class Demo extends React.Component {
     super();
     this.state = {
       data: {
-        text: 123
+        text: 124
       }
     };
   }
@@ -59,7 +55,7 @@ class Demo extends React.Component {
   ]))
   }
 }
-
-console.log(new Demo(), React);
+let demo = new Demo();
+console.log(demo, demo.render(), React);
 
 module.exports = Demo;

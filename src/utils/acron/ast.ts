@@ -1,6 +1,6 @@
 import "ast";
 import * as acorn from 'acorn';
-import { babel, generate } from '@/utils/babel';
+import { babel, generate } from '@/utils/acron/babel';
 import Subscribe from '@/utils/subscribe';
 import Dom from './dom';
 

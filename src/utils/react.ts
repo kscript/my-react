@@ -3,11 +3,10 @@ const { Parser, Node } = acorn;
 const { parse } = babel;
 
 let rid = 1;
-export const createElement = (el: string, opt: AnyObject | null, content: string) => {
-    // console.log(el, opt, content);
-    return generate(el, Object.assign({
-    }, opt), content);
+export const createElement =  (type: AnyObject & Function, config: AnyObject | null, children: any[]) => {
+    console.log(type, config, children);
 }
+
 export class Component {
     private state: AnyObject = {};
     private rid: number = 1;

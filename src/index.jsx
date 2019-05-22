@@ -19,5 +19,5 @@ export default class Demo extends React.Component {
   </span>)
   }
 }
-
-console.log(new Demo(), React);
+let demo = new Demo();
+console.log(demo, demo.render(), React);
