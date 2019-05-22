@@ -1,6 +1,7 @@
 import * as Babel from '@babel/parser';
 import * as Acorn from 'acorn';
-import * as Generate from '@babel/generator';
+// / @ts-ignore 
+import Generate from '@babel/generator';
 /// @ts-ignore 
 // https://github.com/Microsoft/TypeScript/pull/19675
 import * as Jsx from 'acorn-jsx';

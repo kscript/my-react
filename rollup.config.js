@@ -1,5 +1,6 @@
 import typescript from "rollup-plugin-typescript";
-import babel from "rollup-plugin-babel";
+import jsx from "rollup-plugin-jsx";
+// import babel from "rollup-plugin-babel";
 export default {
     input: 'src/index.js',
     output: {
@@ -11,6 +12,7 @@ export default {
             "target": "es5",
             "sourceMap": false
         }),
-        babel()
+        jsx({factory: 'React.createElement'}),
+        // babel()
     ]
 };

@@ -1,24 +1,71 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
 var Babel = require('@babel/parser');
 var Acorn = require('acorn');
-require('@babel/generator');
-var Jsx = require('acorn-jsx');
+var Generate = _interopDefault(require('@babel/generator'));
+require('acorn-jsx');
 
 var acorn = Acorn;
 var babel = Babel;
-var jsx = Jsx;
+var generate = Generate;
 
 var Parser = acorn.Parser, Node = acorn.Node;
 var parse = babel.parse;
-var node = Parser.extend(jsx({
-    preserveParens: true,
-    allowNamespacedObjects: true,
-})).parse("<span>\n  <span>{this.state.data.text}</span>\n  {this.state.data.text}\n  <bar text={this.state.data.text} test=\"text\">\n    <span><span>1</span></span>\n    <div><span>111</span></div>\n  </bar>\n</span>");
-console.log(node);
+var rid = 1;
+var createElement = function (el, opt, content) {
+    // console.log(el, opt, content);
+    return generate(el, Object.assign({}, opt), content);
+};
+var Component = /** @class */ (function () {
+    function Component() {
+        this.state = {};
+        this.rid = 1;
+        this.rid = rid++;
+    }
+    Component.prototype.setState = function (set) {
+        if (typeof set !== 'function') {
+            for (var _i = 0, _a = Object.keys(set); _i < _a.length; _i++) {
+                var key = _a[_i];
+                this.state[key] = set[key];
+            }
+        }
+    };
+    return Component;
+}());
+var React = {
+    Component: Component,
+    createElement: createElement
+};
 
-},{"@babel/generator":15,"@babel/parser":22,"acorn":101,"acorn-jsx":99}],2:[function(require,module,exports){
+class Demo extends React.Component {
+  constructor(){
+    super();
+    this.state = {
+      data: {
+        text: 123
+      }
+    };
+  }
+  render(){
+    return (React.createElement('span', null, [
+    React.createElement('span', null, [this.state.data.text]),
+    this.state.data.text,
+    React.createElement('bar', {text: this.state.data.text, test: "text"}, [
+      React.createElement('span', null, [React.createElement('span', null, ["1"])]),
+      React.createElement('div', null, [React.createElement('span', null, ["111"])])
+    ])
+  ]))
+  }
+}
+
+console.log(new Demo(), React);
+
+module.exports = Demo;
+
+},{"@babel/generator":15,"@babel/parser":21,"acorn":100,"acorn-jsx":98}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -565,7 +612,7 @@ function _classMethodHead(node) {
 
   this._methodHead(node);
 }
-},{"@babel/types":64}],5:[function(require,module,exports){
+},{"@babel/types":63}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -858,7 +905,7 @@ function PrivateName(node) {
   this.token("#");
   this.print(node.id, node);
 }
-},{"../node":16,"@babel/types":64}],6:[function(require,module,exports){
+},{"../node":16,"@babel/types":63}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1487,7 +1534,7 @@ function Variance(node) {
 function VoidTypeAnnotation() {
   this.word("void");
 }
-},{"./modules":10,"./types":13,"@babel/types":64}],7:[function(require,module,exports){
+},{"./modules":10,"./types":13,"@babel/types":63}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1939,7 +1986,7 @@ function ArrowFunctionExpression(node) {
 function hasTypes(node, param) {
   return node.typeParameters || node.returnType || param.typeAnnotation || param.optional || param.trailingComments;
 }
-},{"@babel/types":64}],10:[function(require,module,exports){
+},{"@babel/types":63}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2154,7 +2201,7 @@ function ImportNamespaceSpecifier(node) {
   this.space();
   this.print(node.local, node);
 }
-},{"@babel/types":64}],11:[function(require,module,exports){
+},{"@babel/types":63}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2474,7 +2521,7 @@ function VariableDeclarator(node) {
     this.print(node.init, node);
   }
 }
-},{"@babel/types":64}],12:[function(require,module,exports){
+},{"@babel/types":63}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2707,7 +2754,7 @@ function PipelineBareFunction(node) {
 function PipelinePrimaryTopicReference() {
   this.token("#");
 }
-},{"@babel/types":64,"jsesc":21}],14:[function(require,module,exports){
+},{"@babel/types":63,"jsesc":106}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3634,7 +3681,7 @@ function needsParens(node, parent, printStack) {
 
   return find(expandedParens, node, parent, printStack);
 }
-},{"./parentheses":17,"./whitespace":18,"@babel/types":64}],17:[function(require,module,exports){
+},{"./parentheses":17,"./whitespace":18,"@babel/types":63}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3888,7 +3935,7 @@ function isFirstInStatement(printStack, {
 
   return false;
 }
-},{"@babel/types":64}],18:[function(require,module,exports){
+},{"@babel/types":63}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4081,7 +4128,7 @@ exports.list = list;
     };
   });
 });
-},{"@babel/types":64}],19:[function(require,module,exports){
+},{"@babel/types":63}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4583,7 +4630,7 @@ function commaSeparator() {
   this.token(",");
   this.space();
 }
-},{"./buffer":2,"./generators":7,"./node":16,"@babel/types":64,"lodash/isInteger":223,"lodash/repeat":236}],20:[function(require,module,exports){
+},{"./buffer":2,"./generators":7,"./node":16,"@babel/types":63,"lodash/isInteger":223,"lodash/repeat":236}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4666,339 +4713,6 @@ class SourceMap {
 
 exports.default = SourceMap;
 },{"source-map":254}],21:[function(require,module,exports){
-(function (Buffer){
-'use strict';
-
-const object = {};
-const hasOwnProperty = object.hasOwnProperty;
-const forOwn = (object, callback) => {
-	for (const key in object) {
-		if (hasOwnProperty.call(object, key)) {
-			callback(key, object[key]);
-		}
-	}
-};
-
-const extend = (destination, source) => {
-	if (!source) {
-		return destination;
-	}
-	forOwn(source, (key, value) => {
-		destination[key] = value;
-	});
-	return destination;
-};
-
-const forEach = (array, callback) => {
-	const length = array.length;
-	let index = -1;
-	while (++index < length) {
-		callback(array[index]);
-	}
-};
-
-const toString = object.toString;
-const isArray = Array.isArray;
-const isBuffer = Buffer.isBuffer;
-const isObject = (value) => {
-	// This is a very simple check, but it’s good enough for what we need.
-	return toString.call(value) == '[object Object]';
-};
-const isString = (value) => {
-	return typeof value == 'string' ||
-		toString.call(value) == '[object String]';
-};
-const isNumber = (value) => {
-	return typeof value == 'number' ||
-		toString.call(value) == '[object Number]';
-};
-const isFunction = (value) => {
-	return typeof value == 'function';
-};
-const isMap = (value) => {
-	return toString.call(value) == '[object Map]';
-};
-const isSet = (value) => {
-	return toString.call(value) == '[object Set]';
-};
-
-/*--------------------------------------------------------------------------*/
-
-// https://mathiasbynens.be/notes/javascript-escapes#single
-const singleEscapes = {
-	'"': '\\"',
-	'\'': '\\\'',
-	'\\': '\\\\',
-	'\b': '\\b',
-	'\f': '\\f',
-	'\n': '\\n',
-	'\r': '\\r',
-	'\t': '\\t'
-	// `\v` is omitted intentionally, because in IE < 9, '\v' == 'v'.
-	// '\v': '\\x0B'
-};
-const regexSingleEscape = /["'\\\b\f\n\r\t]/;
-
-const regexDigit = /[0-9]/;
-const regexWhitelist = /[ !#-&\(-\[\]-_a-~]/;
-
-const jsesc = (argument, options) => {
-	const increaseIndentation = () => {
-		oldIndent = indent;
-		++options.indentLevel;
-		indent = options.indent.repeat(options.indentLevel)
-	};
-	// Handle options
-	const defaults = {
-		'escapeEverything': false,
-		'minimal': false,
-		'isScriptContext': false,
-		'quotes': 'single',
-		'wrap': false,
-		'es6': false,
-		'json': false,
-		'compact': true,
-		'lowercaseHex': false,
-		'numbers': 'decimal',
-		'indent': '\t',
-		'indentLevel': 0,
-		'__inline1__': false,
-		'__inline2__': false
-	};
-	const json = options && options.json;
-	if (json) {
-		defaults.quotes = 'double';
-		defaults.wrap = true;
-	}
-	options = extend(defaults, options);
-	if (
-		options.quotes != 'single' &&
-		options.quotes != 'double' &&
-		options.quotes != 'backtick'
-	) {
-		options.quotes = 'single';
-	}
-	const quote = options.quotes == 'double' ?
-		'"' :
-		(options.quotes == 'backtick' ?
-			'`' :
-			'\''
-		);
-	const compact = options.compact;
-	const lowercaseHex = options.lowercaseHex;
-	let indent = options.indent.repeat(options.indentLevel);
-	let oldIndent = '';
-	const inline1 = options.__inline1__;
-	const inline2 = options.__inline2__;
-	const newLine = compact ? '' : '\n';
-	let result;
-	let isEmpty = true;
-	const useBinNumbers = options.numbers == 'binary';
-	const useOctNumbers = options.numbers == 'octal';
-	const useDecNumbers = options.numbers == 'decimal';
-	const useHexNumbers = options.numbers == 'hexadecimal';
-
-	if (json && argument && isFunction(argument.toJSON)) {
-		argument = argument.toJSON();
-	}
-
-	if (!isString(argument)) {
-		if (isMap(argument)) {
-			if (argument.size == 0) {
-				return 'new Map()';
-			}
-			if (!compact) {
-				options.__inline1__ = true;
-				options.__inline2__ = false;
-			}
-			return 'new Map(' + jsesc(Array.from(argument), options) + ')';
-		}
-		if (isSet(argument)) {
-			if (argument.size == 0) {
-				return 'new Set()';
-			}
-			return 'new Set(' + jsesc(Array.from(argument), options) + ')';
-		}
-		if (isBuffer(argument)) {
-			if (argument.length == 0) {
-				return 'Buffer.from([])';
-			}
-			return 'Buffer.from(' + jsesc(Array.from(argument), options) + ')';
-		}
-		if (isArray(argument)) {
-			result = [];
-			options.wrap = true;
-			if (inline1) {
-				options.__inline1__ = false;
-				options.__inline2__ = true;
-			}
-			if (!inline2) {
-				increaseIndentation();
-			}
-			forEach(argument, (value) => {
-				isEmpty = false;
-				if (inline2) {
-					options.__inline2__ = false;
-				}
-				result.push(
-					(compact || inline2 ? '' : indent) +
-					jsesc(value, options)
-				);
-			});
-			if (isEmpty) {
-				return '[]';
-			}
-			if (inline2) {
-				return '[' + result.join(', ') + ']';
-			}
-			return '[' + newLine + result.join(',' + newLine) + newLine +
-				(compact ? '' : oldIndent) + ']';
-		} else if (isNumber(argument)) {
-			if (json) {
-				// Some number values (e.g. `Infinity`) cannot be represented in JSON.
-				return JSON.stringify(argument);
-			}
-			if (useDecNumbers) {
-				return String(argument);
-			}
-			if (useHexNumbers) {
-				let hexadecimal = argument.toString(16);
-				if (!lowercaseHex) {
-					hexadecimal = hexadecimal.toUpperCase();
-				}
-				return '0x' + hexadecimal;
-			}
-			if (useBinNumbers) {
-				return '0b' + argument.toString(2);
-			}
-			if (useOctNumbers) {
-				return '0o' + argument.toString(8);
-			}
-		} else if (!isObject(argument)) {
-			if (json) {
-				// For some values (e.g. `undefined`, `function` objects),
-				// `JSON.stringify(value)` returns `undefined` (which isn’t valid
-				// JSON) instead of `'null'`.
-				return JSON.stringify(argument) || 'null';
-			}
-			return String(argument);
-		} else { // it’s an object
-			result = [];
-			options.wrap = true;
-			increaseIndentation();
-			forOwn(argument, (key, value) => {
-				isEmpty = false;
-				result.push(
-					(compact ? '' : indent) +
-					jsesc(key, options) + ':' +
-					(compact ? '' : ' ') +
-					jsesc(value, options)
-				);
-			});
-			if (isEmpty) {
-				return '{}';
-			}
-			return '{' + newLine + result.join(',' + newLine) + newLine +
-				(compact ? '' : oldIndent) + '}';
-		}
-	}
-
-	const string = argument;
-	// Loop over each code unit in the string and escape it
-	let index = -1;
-	const length = string.length;
-	result = '';
-	while (++index < length) {
-		const character = string.charAt(index);
-		if (options.es6) {
-			const first = string.charCodeAt(index);
-			if ( // check if it’s the start of a surrogate pair
-				first >= 0xD800 && first <= 0xDBFF && // high surrogate
-				length > index + 1 // there is a next code unit
-			) {
-				const second = string.charCodeAt(index + 1);
-				if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-					// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-					const codePoint = (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
-					let hexadecimal = codePoint.toString(16);
-					if (!lowercaseHex) {
-						hexadecimal = hexadecimal.toUpperCase();
-					}
-					result += '\\u{' + hexadecimal + '}';
-					++index;
-					continue;
-				}
-			}
-		}
-		if (!options.escapeEverything) {
-			if (regexWhitelist.test(character)) {
-				// It’s a printable ASCII character that is not `"`, `'` or `\`,
-				// so don’t escape it.
-				result += character;
-				continue;
-			}
-			if (character == '"') {
-				result += quote == character ? '\\"' : character;
-				continue;
-			}
-			if (character == '`') {
-				result += quote == character ? '\\`' : character;
-				continue;
-			}
-			if (character == '\'') {
-				result += quote == character ? '\\\'' : character;
-				continue;
-			}
-		}
-		if (
-			character == '\0' &&
-			!json &&
-			!regexDigit.test(string.charAt(index + 1))
-		) {
-			result += '\\0';
-			continue;
-		}
-		if (regexSingleEscape.test(character)) {
-			// no need for a `hasOwnProperty` check here
-			result += singleEscapes[character];
-			continue;
-		}
-		const charCode = character.charCodeAt(0);
-		if (options.minimal && charCode != 0x2028 && charCode != 0x2029) {
-			result += character;
-			continue;
-		}
-		let hexadecimal = charCode.toString(16);
-		if (!lowercaseHex) {
-			hexadecimal = hexadecimal.toUpperCase();
-		}
-		const longhand = hexadecimal.length > 2 || json;
-		const escaped = '\\' + (longhand ? 'u' : 'x') +
-			('0000' + hexadecimal).slice(longhand ? -4 : -2);
-		result += escaped;
-		continue;
-	}
-	if (options.wrap) {
-		result = quote + result + quote;
-	}
-	if (quote == '`') {
-		result = result.replace(/\$\{/g, '\\\$\{');
-	}
-	if (options.isScriptContext) {
-		// https://mathiasbynens.be/notes/etago
-		return result
-			.replace(/<\/(script|style)/gi, '<\\/$1')
-			.replace(/<!--/g, json ? '\\u003C!--' : '\\x3C!--');
-	}
-	return result;
-};
-
-jsesc.version = '2.5.2';
-
-module.exports = jsesc;
-
-}).call(this,{"isBuffer":require("../../../../is-buffer/index.js")})
-},{"../../../../is-buffer/index.js":106}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -5777,7 +5491,7 @@ var flow = (superClass => class extends superClass {
   }
 
   finishToken(type, val) {
-    if (!(type === types.string || type === types.semi)) {
+    if (type !== types.string && type !== types.semi && type !== types.interpreterDirective) {
       if (this.flowPragma === undefined) {
         this.flowPragma = null;
       }
@@ -5880,7 +5594,7 @@ var flow = (superClass => class extends superClass {
     [typeNode.returnType, node.predicate] = this.flowParseTypeAndPredicateInitialiser();
     typeContainer.typeAnnotation = this.finishNode(typeNode, "FunctionTypeAnnotation");
     id.typeAnnotation = this.finishNode(typeContainer, "TypeAnnotation");
-    this.finishNode(id, id.type);
+    this.resetEndLocation(id);
     this.semicolon();
     return this.finishNode(node, "DeclareFunction");
   }
@@ -5892,12 +5606,12 @@ var flow = (superClass => class extends superClass {
       return this.flowParseDeclareFunction(node);
     } else if (this.match(types._var)) {
       return this.flowParseDeclareVariable(node);
-    } else if (this.isContextual("module")) {
-      if (this.lookahead().type === types.dot) {
+    } else if (this.eatContextual("module")) {
+      if (this.match(types.dot)) {
         return this.flowParseDeclareModuleExports(node);
       } else {
         if (insideModule) {
-          this.unexpected(null, "`declare module` cannot be used inside another `declare module`");
+          this.unexpected(this.state.lastTokStart, "`declare module` cannot be used inside another `declare module`");
         }
 
         return this.flowParseDeclareModule(node);
@@ -5923,7 +5637,6 @@ var flow = (superClass => class extends superClass {
   }
 
   flowParseDeclareModule(node) {
-    this.next();
     this.scope.enter(SCOPE_OTHER);
 
     if (this.match(types.string)) {
@@ -5940,13 +5653,12 @@ var flow = (superClass => class extends superClass {
       let bodyNode = this.startNode();
 
       if (this.match(types._import)) {
-        const lookahead = this.lookahead();
+        this.next();
 
-        if (lookahead.value !== "type" && lookahead.value !== "typeof") {
-          this.unexpected(null, "Imports within a `declare module` body must always be `import type` or `import typeof`");
+        if (!this.isContextual("type") && !this.isContextual("typeof")) {
+          this.unexpected(this.state.lastTokStart, "Imports within a `declare module` body must always be `import type` or `import typeof`");
         }
 
-        this.next();
         this.parseImport(bodyNode);
       } else {
         this.expectContextual("declare", "Only declares and type imports are allowed inside declare module");
@@ -6025,8 +5737,7 @@ var flow = (superClass => class extends superClass {
   }
 
   flowParseDeclareModuleExports(node) {
-    this.expectContextual("module");
-    this.expect(types.dot);
+    this.next();
     this.expectContextual("exports");
     node.typeAnnotation = this.flowParseTypeAnnotation();
     this.semicolon();
@@ -6036,13 +5747,15 @@ var flow = (superClass => class extends superClass {
   flowParseDeclareTypeAlias(node) {
     this.next();
     this.flowParseTypeAlias(node);
-    return this.finishNode(node, "DeclareTypeAlias");
+    node.type = "DeclareTypeAlias";
+    return node;
   }
 
   flowParseDeclareOpaqueType(node) {
     this.next();
     this.flowParseOpaqueType(node, true);
-    return this.finishNode(node, "DeclareOpaqueType");
+    node.type = "DeclareOpaqueType";
+    return node;
   }
 
   flowParseDeclareInterface(node) {
@@ -6963,7 +6676,7 @@ var flow = (superClass => class extends superClass {
 
     if (this.match(types.colon)) {
       ident.typeAnnotation = this.flowParseTypeAnnotation();
-      this.finishNode(ident, ident.type);
+      this.resetEndLocation(ident);
     }
 
     return ident;
@@ -6971,7 +6684,8 @@ var flow = (superClass => class extends superClass {
 
   typeCastToParameter(node) {
     node.expression.typeAnnotation = node.typeAnnotation;
-    return this.finishNodeAt(node.expression, node.expression.type, node.typeAnnotation.end, node.typeAnnotation.loc.end);
+    this.resetEndLocation(node.expression, node.typeAnnotation.end, node.typeAnnotation.loc.end);
+    return node.expression;
   }
 
   flowParseVariance() {
@@ -7202,6 +6916,7 @@ var flow = (superClass => class extends superClass {
 
     if (this.eat(types.question)) {
       node.optional = true;
+      this.resetEndLocation(node);
     }
 
     if (this.match(types.colon)) {
@@ -7467,7 +7182,7 @@ var flow = (superClass => class extends superClass {
       param.typeAnnotation = this.flowParseTypeAnnotation();
     }
 
-    this.finishNode(param, param.type);
+    this.resetEndLocation(param);
     return param;
   }
 
@@ -7598,7 +7313,7 @@ var flow = (superClass => class extends superClass {
 
     if (this.match(types.colon)) {
       decl.id.typeAnnotation = this.flowParseTypeAnnotation();
-      this.finishNode(decl.id, decl.id.type);
+      this.resetEndLocation(decl.id);
     }
   }
 
@@ -8412,7 +8127,9 @@ var jsx = (superClass => class extends superClass {
 
     switch (this.state.type) {
       case types.braceL:
-        node = this.jsxParseExpressionContainer();
+        node = this.startNode();
+        this.next();
+        node = this.jsxParseExpressionContainer(node);
 
         if (node.expression.type === "JSXEmptyExpression") {
           throw this.raise(node.start, "JSX attributes must only be assigned a non-empty expression");
@@ -8434,19 +8151,14 @@ var jsx = (superClass => class extends superClass {
     return this.finishNodeAt(node, "JSXEmptyExpression", this.state.start, this.state.startLoc);
   }
 
-  jsxParseSpreadChild() {
-    const node = this.startNode();
-    this.expect(types.braceL);
-    this.expect(types.ellipsis);
+  jsxParseSpreadChild(node) {
+    this.next();
     node.expression = this.parseExpression();
     this.expect(types.braceR);
     return this.finishNode(node, "JSXSpreadChild");
   }
 
-  jsxParseExpressionContainer() {
-    const node = this.startNode();
-    this.next();
-
+  jsxParseExpressionContainer(node) {
     if (this.match(types.braceR)) {
       node.expression = this.jsxParseEmptyExpression();
     } else {
@@ -8537,13 +8249,18 @@ var jsx = (superClass => class extends superClass {
             break;
 
           case types.braceL:
-            if (this.lookahead().type === types.ellipsis) {
-              children.push(this.jsxParseSpreadChild());
-            } else {
-              children.push(this.jsxParseExpressionContainer());
-            }
+            {
+              const node = this.startNode();
+              this.next();
 
-            break;
+              if (this.match(types.ellipsis)) {
+                children.push(this.jsxParseSpreadChild(node));
+              } else {
+                children.push(this.jsxParseExpressionContainer(node));
+              }
+
+              break;
+            }
 
           default:
             throw this.unexpected();
@@ -9187,13 +8904,7 @@ var typescript = (superClass => class extends superClass {
     }
   }
 
-  tsParseSignatureMember(kind) {
-    const node = this.startNode();
-
-    if (kind === "TSConstructSignatureDeclaration") {
-      this.expect(types._new);
-    }
-
+  tsParseSignatureMember(kind, node) {
     this.tsFillSignature(types.colon, node);
     this.tsParseTypeMemberSemicolon();
     return this.finishNode(node, kind);
@@ -9212,7 +8923,7 @@ var typescript = (superClass => class extends superClass {
     this.expect(types.bracketL);
     const id = this.parseIdentifier();
     id.typeAnnotation = this.tsParseTypeAnnotation();
-    this.finishNode(id, "Identifier");
+    this.resetEndLocation(id);
     this.expect(types.bracketR);
     node.parameters = [id];
     const type = this.tsTryParseTypeAnnotation();
@@ -9222,7 +8933,6 @@ var typescript = (superClass => class extends superClass {
   }
 
   tsParsePropertyOrMethodSignature(node, readonly) {
-    this.parsePropertyName(node);
     if (this.eat(types.question)) node.optional = true;
     const nodeAny = node;
 
@@ -9242,15 +8952,24 @@ var typescript = (superClass => class extends superClass {
   }
 
   tsParseTypeMember() {
-    if (this.match(types.parenL) || this.isRelational("<")) {
-      return this.tsParseSignatureMember("TSCallSignatureDeclaration");
-    }
-
-    if (this.match(types._new) && this.tsLookAhead(this.tsIsStartOfConstructSignature.bind(this))) {
-      return this.tsParseSignatureMember("TSConstructSignatureDeclaration");
-    }
-
     const node = this.startNode();
+
+    if (this.match(types.parenL) || this.isRelational("<")) {
+      return this.tsParseSignatureMember("TSCallSignatureDeclaration", node);
+    }
+
+    if (this.match(types._new)) {
+      const id = this.startNode();
+      this.next();
+
+      if (this.match(types.parenL) || this.isRelational("<")) {
+        return this.tsParseSignatureMember("TSConstructSignatureDeclaration", node);
+      } else {
+        node.key = this.createIdentifier(id, "new");
+        return this.tsParsePropertyOrMethodSignature(node, false);
+      }
+    }
+
     const readonly = !!this.tsParseModifier(["readonly"]);
     const idx = this.tsTryParseIndexSignature(node);
 
@@ -9259,12 +8978,8 @@ var typescript = (superClass => class extends superClass {
       return idx;
     }
 
+    this.parsePropertyName(node);
     return this.tsParsePropertyOrMethodSignature(node, readonly);
-  }
-
-  tsIsStartOfConstructSignature() {
-    this.next();
-    return this.match(types.parenL) || this.isRelational("<");
   }
 
   tsParseTypeLiteral() {
@@ -10131,6 +9846,10 @@ var typescript = (superClass => class extends superClass {
   }
 
   tsTryParseGenericAsyncArrowFunction(startPos, startLoc) {
+    if (!this.isRelational("<")) {
+      return undefined;
+    }
+
     const res = this.tsTryParseAndCatch(() => {
       const node = this.startNodeAt(startPos, startLoc);
       node.typeParameters = this.tsParseTypeParameters();
@@ -10481,6 +10200,7 @@ var typescript = (superClass => class extends superClass {
 
     if (this.eat(types.question)) {
       node.optional = true;
+      this.resetEndLocation(node);
     }
 
     if (this.match(types.colon)) {
@@ -10490,7 +10210,7 @@ var typescript = (superClass => class extends superClass {
       return this.finishNode(typeCastNode, "TSTypeCastExpression");
     }
 
-    return this.finishNode(node, node.type);
+    return node;
   }
 
   parseExportDeclaration(node) {
@@ -10582,7 +10302,7 @@ var typescript = (superClass => class extends superClass {
 
     if (type) {
       decl.id.typeAnnotation = type;
-      this.finishNode(decl.id, decl.id.type);
+      this.resetEndLocation(decl.id);
     }
   }
 
@@ -10670,8 +10390,12 @@ var typescript = (superClass => class extends superClass {
 
       try {
         const returnType = this.tsParseTypeOrTypePredicateAnnotation(types.colon);
-        if (this.canInsertSemicolon()) this.unexpected();
-        if (!this.match(types.arrow)) this.unexpected();
+
+        if (this.canInsertSemicolon() || !this.match(types.arrow)) {
+          this.state = state;
+          return undefined;
+        }
+
         node.returnType = returnType;
       } catch (err) {
         if (err instanceof SyntaxError) {
@@ -10696,7 +10420,8 @@ var typescript = (superClass => class extends superClass {
 
     const type = this.tsTryParseTypeAnnotation();
     if (type) param.typeAnnotation = type;
-    return this.finishNode(param, param.type);
+    this.resetEndLocation(param);
+    return param;
   }
 
   toAssignable(node, isBinding, contextDescription) {
@@ -10813,7 +10538,8 @@ var typescript = (superClass => class extends superClass {
 
   typeCastToParameter(node) {
     node.expression.typeAnnotation = node.typeAnnotation;
-    return this.finishNodeAt(node.expression, node.expression.type, node.typeAnnotation.end, node.typeAnnotation.loc.end);
+    this.resetEndLocation(node.expression, node.typeAnnotation.end, node.typeAnnotation.loc.end);
+    return node.expression;
   }
 
   toReferencedList(exprList, isInParens) {
@@ -10841,8 +10567,11 @@ var typescript = (superClass => class extends superClass {
   }
 
   jsxParseOpeningElementAfterName(node) {
-    const typeArguments = this.tsTryParseAndCatch(() => this.tsParseTypeArguments());
-    if (typeArguments) node.typeParameters = typeArguments;
+    if (this.isRelational("<")) {
+      const typeArguments = this.tsTryParseAndCatch(() => this.tsParseTypeArguments());
+      if (typeArguments) node.typeParameters = typeArguments;
+    }
+
     return super.jsxParseOpeningElementAfterName(node);
   }
 
@@ -10872,8 +10601,9 @@ var placeholders = (superClass => class extends superClass {
   }
 
   finishPlaceholder(node, expectedNode) {
+    const isFinished = !!(node.expectedNode && node.type === "Placeholder");
     node.expectedNode = expectedNode;
-    return this.finishNode(node, "Placeholder");
+    return isFinished ? node : this.finishNode(node, "Placeholder");
   }
 
   getTokenFromCode(code) {
@@ -11314,11 +11044,17 @@ class CommentsParser extends BaseParser {
 }
 
 class LocationParser extends CommentsParser {
+  getLocationForPosition(pos) {
+    let loc;
+    if (pos === this.state.start) loc = this.state.startLoc;else if (pos === this.state.lastTokStart) loc = this.state.lastTokStartLoc;else if (pos === this.state.end) loc = this.state.endLoc;else if (pos === this.state.lastTokEnd) loc = this.state.lastTokEndLoc;else loc = getLineInfo(this.input, pos);
+    return loc;
+  }
+
   raise(pos, message, {
     missingPluginNames,
     code
   } = {}) {
-    const loc = getLineInfo(this.input, pos);
+    const loc = this.getLocationForPosition(pos);
     message += ` (${loc.line}:${loc.column})`;
     const err = new SyntaxError(message);
     err.pos = pos;
@@ -11404,7 +11140,7 @@ class State {
       const key = keys[i];
       let val = this[key];
 
-      if ((!skipArrays || key === "context") && Array.isArray(val)) {
+      if (!skipArrays && Array.isArray(val)) {
         val = val.slice();
       }
 
@@ -11530,12 +11266,9 @@ class Tokenizer extends LocationParser {
       end: end,
       loc: new SourceLocation(startLoc, endLoc)
     };
-
-    if (!this.isLookahead) {
-      if (this.options.tokens) this.state.tokens.push(comment);
-      this.state.comments.push(comment);
-      this.addComment(comment);
-    }
+    if (this.options.tokens) this.state.tokens.push(comment);
+    this.state.comments.push(comment);
+    this.addComment(comment);
   }
 
   skipBlockComment() {
@@ -11552,6 +11285,7 @@ class Tokenizer extends LocationParser {
       this.state.lineStart = match.index + match[0].length;
     }
 
+    if (this.isLookahead) return;
     this.pushComment(true, this.input.slice(start + 2, end), start, this.state.pos, startLoc, this.state.curPosition());
   }
 
@@ -11566,6 +11300,7 @@ class Tokenizer extends LocationParser {
       }
     }
 
+    if (this.isLookahead) return;
     this.pushComment(false, this.input.slice(start + startSkip, this.state.pos), start, this.state.pos, startLoc, this.state.curPosition());
   }
 
@@ -11626,7 +11361,7 @@ class Tokenizer extends LocationParser {
     const prevType = this.state.type;
     this.state.type = type;
     this.state.value = val;
-    this.updateContext(prevType);
+    if (!this.isLookahead) this.updateContext(prevType);
   }
 
   readToken_numberSign() {
@@ -12733,6 +12468,7 @@ class NodeUtils extends UtilParser {
   }
 
   finishNodeAt(node, type, pos, loc) {
+
     node.type = type;
     node.end = pos;
     node.loc.end = loc;
@@ -12745,6 +12481,12 @@ class NodeUtils extends UtilParser {
     node.start = start;
     node.loc.start = startLoc;
     if (this.options.ranges) node.range[0] = start;
+  }
+
+  resetEndLocation(node, end = this.state.lastTokEnd, endLoc = this.state.lastTokEndLoc) {
+    node.end = end;
+    node.loc.end = endLoc;
+    if (this.options.ranges) node.range[1] = end;
   }
 
   resetStartLocationFromNode(node, locationNode) {
@@ -13645,13 +13387,14 @@ class ExpressionParser extends LValParser {
         return this.finishNode(node, "Super");
 
       case types._import:
-        if (this.lookahead().type === types.dot) {
-          return this.parseImportMetaProperty();
-        }
-
-        this.expectPlugin("dynamicImport");
         node = this.startNode();
         this.next();
+
+        if (this.match(types.dot)) {
+          return this.parseImportMetaProperty(node);
+        }
+
+        this.expectPlugin("dynamicImport", node.start);
 
         if (!this.match(types.parenL)) {
           this.unexpected(null, types.parenL);
@@ -13857,17 +13600,14 @@ class ExpressionParser extends LValParser {
     return this.finishNode(node, "MetaProperty");
   }
 
-  parseImportMetaProperty() {
-    const node = this.startNode();
-    const id = this.parseIdentifier(true);
+  parseImportMetaProperty(node) {
+    const id = this.createIdentifier(this.startNodeAtNode(node), "import");
     this.expect(types.dot);
 
-    if (id.name === "import") {
-      if (this.isContextual("meta")) {
-        this.expectPlugin("importMeta");
-      } else if (!this.hasPlugin("importMeta")) {
-        this.raise(id.start, `Dynamic imports require a parameter: import('a.js')`);
-      }
+    if (this.isContextual("meta")) {
+      this.expectPlugin("importMeta");
+    } else if (!this.hasPlugin("importMeta")) {
+      this.raise(id.start, `Dynamic imports require a parameter: import('a.js')`);
     }
 
     if (!this.inModule) {
@@ -14675,7 +14415,6 @@ class ExpressionParser extends LValParser {
 
 }
 
-const empty = [];
 const loopLabel = {
   kind: "loop"
 },
@@ -15220,7 +14959,6 @@ class StatementParser extends ExpressionParser {
       node.handler = this.finishNode(clause, "CatchClause");
     }
 
-    node.guardedHandlers = empty;
     node.finalizer = this.eat(types._finally) ? this.parseBlock() : null;
 
     if (!node.handler && !node.finalizer) {
@@ -16292,7 +16030,7 @@ exports.parse = parse;
 exports.parseExpression = parseExpression;
 exports.tokTypes = types;
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16310,7 +16048,7 @@ function assertNode(node) {
     throw new TypeError(`Not a valid node of type "${type}"`);
   }
 }
-},{"../validators/isNode":85}],24:[function(require,module,exports){
+},{"../validators/isNode":84}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17675,7 +17413,7 @@ function assertSpreadProperty(node, opts) {
   console.trace("The node type SpreadProperty has been renamed to SpreadElement");
   assert("SpreadProperty", node, opts);
 }
-},{"../../validators/is":80}],25:[function(require,module,exports){
+},{"../../validators/is":79}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17726,7 +17464,7 @@ function builder(type, ...args) {
 
   return node;
 }
-},{"../definitions":58,"../validators/validate":98,"lodash/clone":216}],26:[function(require,module,exports){
+},{"../definitions":57,"../validators/validate":97,"lodash/clone":216}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17755,7 +17493,7 @@ function createTypeAnnotationBasedOnTypeof(type) {
     throw new Error("Invalid typeof value");
   }
 }
-},{"../generated":28}],27:[function(require,module,exports){
+},{"../generated":27}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17778,7 +17516,7 @@ function createUnionTypeAnnotation(types) {
     return (0, _generated.unionTypeAnnotation)(flattened);
   }
 }
-},{"../../modifications/flow/removeTypeDuplicates":66,"../generated":28}],28:[function(require,module,exports){
+},{"../../modifications/flow/removeTypeDuplicates":65,"../generated":27}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18927,7 +18665,7 @@ function SpreadProperty(...args) {
   console.trace("The node type SpreadProperty has been renamed to SpreadElement");
   return SpreadProperty("SpreadProperty", ...args);
 }
-},{"../builder":25}],29:[function(require,module,exports){
+},{"../builder":24}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18959,7 +18697,7 @@ function buildChildren(node) {
 
   return elements;
 }
-},{"../../utils/react/cleanJSXElementLiteralChild":76,"../../validators/generated":79}],30:[function(require,module,exports){
+},{"../../utils/react/cleanJSXElementLiteralChild":75,"../../validators/generated":78}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18974,7 +18712,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function clone(node) {
   return (0, _cloneNode.default)(node, false);
 }
-},{"./cloneNode":32}],31:[function(require,module,exports){
+},{"./cloneNode":31}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18989,7 +18727,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function cloneDeep(node) {
   return (0, _cloneNode.default)(node);
 }
-},{"./cloneNode":32}],32:[function(require,module,exports){
+},{"./cloneNode":31}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19068,7 +18806,7 @@ function cloneNode(node, deep = true) {
 
   return newNode;
 }
-},{"../definitions":58}],33:[function(require,module,exports){
+},{"../definitions":57}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19085,7 +18823,7 @@ function cloneWithoutLoc(node) {
   newNode.loc = null;
   return newNode;
 }
-},{"./clone":30}],34:[function(require,module,exports){
+},{"./clone":29}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19103,7 +18841,7 @@ function addComment(node, type, content, line) {
     value: content
   }]);
 }
-},{"./addComments":35}],35:[function(require,module,exports){
+},{"./addComments":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19127,7 +18865,7 @@ function addComments(node, type, comments) {
 
   return node;
 }
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19142,7 +18880,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function inheritInnerComments(child, parent) {
   (0, _inherit.default)("innerComments", child, parent);
 }
-},{"../utils/inherit":75}],37:[function(require,module,exports){
+},{"../utils/inherit":74}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19157,7 +18895,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function inheritLeadingComments(child, parent) {
   (0, _inherit.default)("leadingComments", child, parent);
 }
-},{"../utils/inherit":75}],38:[function(require,module,exports){
+},{"../utils/inherit":74}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19172,7 +18910,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function inheritTrailingComments(child, parent) {
   (0, _inherit.default)("trailingComments", child, parent);
 }
-},{"../utils/inherit":75}],39:[function(require,module,exports){
+},{"../utils/inherit":74}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19194,7 +18932,7 @@ function inheritsComments(child, parent) {
   (0, _inheritInnerComments.default)(child, parent);
   return child;
 }
-},{"./inheritInnerComments":36,"./inheritLeadingComments":37,"./inheritTrailingComments":38}],40:[function(require,module,exports){
+},{"./inheritInnerComments":35,"./inheritLeadingComments":36,"./inheritTrailingComments":37}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19211,7 +18949,7 @@ function removeComments(node) {
 
   return node;
 }
-},{"../constants":42}],41:[function(require,module,exports){
+},{"../constants":41}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19305,7 +19043,7 @@ const TSTYPEELEMENT_TYPES = _definitions.FLIPPED_ALIAS_KEYS["TSTypeElement"];
 exports.TSTYPEELEMENT_TYPES = TSTYPEELEMENT_TYPES;
 const TSTYPE_TYPES = _definitions.FLIPPED_ALIAS_KEYS["TSType"];
 exports.TSTYPE_TYPES = TSTYPE_TYPES;
-},{"../../definitions":58}],42:[function(require,module,exports){
+},{"../../definitions":57}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19353,7 +19091,7 @@ const BLOCK_SCOPED_SYMBOL = Symbol.for("var used to be block scoped");
 exports.BLOCK_SCOPED_SYMBOL = BLOCK_SCOPED_SYMBOL;
 const NOT_LOCAL_BINDING = Symbol.for("should not be considered a local binding");
 exports.NOT_LOCAL_BINDING = NOT_LOCAL_BINDING;
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19368,7 +19106,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function ensureBlock(node, key = "body") {
   return node[key] = (0, _toBlock.default)(node[key], node);
 }
-},{"./toBlock":46}],44:[function(require,module,exports){
+},{"./toBlock":45}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19442,7 +19180,7 @@ function gatherSequenceExpressions(nodes, scope, declars) {
     return (0, _generated2.sequenceExpression)(exprs);
   }
 }
-},{"../builders/generated":28,"../clone/cloneNode":32,"../retrievers/getBindingIdentifiers":71,"../validators/generated":79}],45:[function(require,module,exports){
+},{"../builders/generated":27,"../clone/cloneNode":31,"../retrievers/getBindingIdentifiers":70,"../validators/generated":78}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19459,7 +19197,7 @@ function toBindingIdentifierName(name) {
   if (name === "eval" || name === "arguments") name = "_" + name;
   return name;
 }
-},{"./toIdentifier":49}],46:[function(require,module,exports){
+},{"./toIdentifier":48}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19494,7 +19232,7 @@ function toBlock(node, parent) {
 
   return (0, _generated2.blockStatement)(blockNodes);
 }
-},{"../builders/generated":28,"../validators/generated":79}],47:[function(require,module,exports){
+},{"../builders/generated":27,"../validators/generated":78}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19510,7 +19248,7 @@ function toComputedKey(node, key = node.key || node.property) {
   if (!node.computed && (0, _generated.isIdentifier)(key)) key = (0, _generated2.stringLiteral)(key.name);
   return key;
 }
-},{"../builders/generated":28,"../validators/generated":79}],48:[function(require,module,exports){
+},{"../builders/generated":27,"../validators/generated":78}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19541,7 +19279,7 @@ function toExpression(node) {
 
   return node;
 }
-},{"../validators/generated":79}],49:[function(require,module,exports){
+},{"../validators/generated":78}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19567,7 +19305,7 @@ function toIdentifier(name) {
 
   return name || "_";
 }
-},{"../validators/isValidIdentifier":93}],50:[function(require,module,exports){
+},{"../validators/isValidIdentifier":92}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19616,7 +19354,7 @@ toKeyAlias.increment = function () {
     return toKeyAlias.uid++;
   }
 };
-},{"../clone/cloneNode":32,"../modifications/removePropertiesDeep":70,"../validators/generated":79}],51:[function(require,module,exports){
+},{"../clone/cloneNode":31,"../modifications/removePropertiesDeep":69,"../validators/generated":78}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19640,7 +19378,7 @@ function toSequenceExpression(nodes, scope) {
 
   return result;
 }
-},{"./gatherSequenceExpressions":44}],52:[function(require,module,exports){
+},{"./gatherSequenceExpressions":43}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19685,7 +19423,7 @@ function toStatement(node, ignore) {
   node.type = newType;
   return node;
 }
-},{"../builders/generated":28,"../validators/generated":79}],53:[function(require,module,exports){
+},{"../builders/generated":27,"../validators/generated":78}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19790,7 +19528,7 @@ function valueToNode(value) {
 
   throw new Error("don't know how to turn this value into a node");
 }
-},{"../builders/generated":28,"../validators/isValidIdentifier":93,"lodash/isPlainObject":228,"lodash/isRegExp":229}],54:[function(require,module,exports){
+},{"../builders/generated":27,"../validators/isValidIdentifier":92,"lodash/isPlainObject":228,"lodash/isRegExp":229}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20516,7 +20254,7 @@ exports.patternLikeCommon = patternLikeCommon;
     }
   }
 });
-},{"../constants":42,"../validators/isValidIdentifier":93,"./utils":63}],55:[function(require,module,exports){
+},{"../constants":41,"../validators/isValidIdentifier":92,"./utils":62}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20907,7 +20645,7 @@ exports.classMethodOrDeclareMethodCommon = classMethodOrDeclareMethodCommon;
     }
   }
 });
-},{"./core":54,"./utils":63}],56:[function(require,module,exports){
+},{"./core":53,"./utils":62}],55:[function(require,module,exports){
 "use strict";
 
 var _utils = _interopRequireWildcard(require("./utils"));
@@ -21113,7 +20851,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
   },
   aliases: ["Expression", "Pureish", "Literal", "Immutable"]
 });
-},{"./es2015":55,"./utils":63}],57:[function(require,module,exports){
+},{"./es2015":54,"./utils":62}],56:[function(require,module,exports){
 "use strict";
 
 var _utils = _interopRequireWildcard(require("./utils"));
@@ -21500,7 +21238,7 @@ defineInterfaceishType("InterfaceDeclaration");
 (0, _utils.default)("VoidTypeAnnotation", {
   aliases: ["Flow", "FlowType", "FlowBaseAnnotation"]
 });
-},{"./utils":63}],58:[function(require,module,exports){
+},{"./utils":62}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21602,7 +21340,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 (0, _toFastProperties().default)(_placeholders.PLACEHOLDERS_FLIPPED_ALIAS);
 const TYPES = Object.keys(_utils.VISITOR_KEYS).concat(Object.keys(_utils.FLIPPED_ALIAS_KEYS)).concat(Object.keys(_utils.DEPRECATED_KEYS));
 exports.TYPES = TYPES;
-},{"./core":54,"./es2015":55,"./experimental":56,"./flow":57,"./jsx":59,"./misc":60,"./placeholders":61,"./typescript":62,"./utils":63,"to-fast-properties":255}],59:[function(require,module,exports){
+},{"./core":53,"./es2015":54,"./experimental":55,"./flow":56,"./jsx":58,"./misc":59,"./placeholders":60,"./typescript":61,"./utils":62,"to-fast-properties":255}],58:[function(require,module,exports){
 "use strict";
 
 var _utils = _interopRequireWildcard(require("./utils"));
@@ -21763,7 +21501,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 (0, _utils.default)("JSXClosingFragment", {
   aliases: ["JSX", "Immutable"]
 });
-},{"./utils":63}],60:[function(require,module,exports){
+},{"./utils":62}],59:[function(require,module,exports){
 "use strict";
 
 var _utils = _interopRequireWildcard(require("./utils"));
@@ -21787,7 +21525,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
     }
   }
 });
-},{"./placeholders":61,"./utils":63}],61:[function(require,module,exports){
+},{"./placeholders":60,"./utils":62}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21821,7 +21559,7 @@ Object.keys(PLACEHOLDERS_ALIAS).forEach(type => {
     PLACEHOLDERS_FLIPPED_ALIAS[alias].push(type);
   });
 });
-},{"./utils":63}],62:[function(require,module,exports){
+},{"./utils":62}],61:[function(require,module,exports){
 "use strict";
 
 var _utils = _interopRequireWildcard(require("./utils"));
@@ -22233,7 +21971,7 @@ const unionOrIntersection = {
     }
   }
 });
-},{"./core":54,"./es2015":55,"./utils":63}],63:[function(require,module,exports){
+},{"./core":53,"./es2015":54,"./utils":62}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22454,7 +22192,7 @@ function defineType(type, opts = {}) {
 }
 
 const store = {};
-},{"../validators/is":80}],64:[function(require,module,exports){
+},{"../validators/is":79}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23034,7 +22772,7 @@ const react = {
   buildChildren: _buildChildren.default
 };
 exports.react = react;
-},{"./asserts/assertNode":23,"./asserts/generated":24,"./builders/flow/createTypeAnnotationBasedOnTypeof":26,"./builders/flow/createUnionTypeAnnotation":27,"./builders/generated":28,"./builders/react/buildChildren":29,"./clone/clone":30,"./clone/cloneDeep":31,"./clone/cloneNode":32,"./clone/cloneWithoutLoc":33,"./comments/addComment":34,"./comments/addComments":35,"./comments/inheritInnerComments":36,"./comments/inheritLeadingComments":37,"./comments/inheritTrailingComments":38,"./comments/inheritsComments":39,"./comments/removeComments":40,"./constants":42,"./constants/generated":41,"./converters/ensureBlock":43,"./converters/toBindingIdentifierName":45,"./converters/toBlock":46,"./converters/toComputedKey":47,"./converters/toExpression":48,"./converters/toIdentifier":49,"./converters/toKeyAlias":50,"./converters/toSequenceExpression":51,"./converters/toStatement":52,"./converters/valueToNode":53,"./definitions":58,"./modifications/appendToMemberExpression":65,"./modifications/flow/removeTypeDuplicates":66,"./modifications/inherits":67,"./modifications/prependToMemberExpression":68,"./modifications/removeProperties":69,"./modifications/removePropertiesDeep":70,"./retrievers/getBindingIdentifiers":71,"./retrievers/getOuterBindingIdentifiers":72,"./traverse/traverse":73,"./traverse/traverseFast":74,"./utils/shallowEqual":77,"./validators/buildMatchMemberExpression":78,"./validators/generated":79,"./validators/is":80,"./validators/isBinding":81,"./validators/isBlockScoped":82,"./validators/isImmutable":83,"./validators/isLet":84,"./validators/isNode":85,"./validators/isNodesEquivalent":86,"./validators/isPlaceholderType":87,"./validators/isReferenced":88,"./validators/isScope":89,"./validators/isSpecifierDefault":90,"./validators/isType":91,"./validators/isValidES3Identifier":92,"./validators/isValidIdentifier":93,"./validators/isVar":94,"./validators/matchesPattern":95,"./validators/react/isCompatTag":96,"./validators/react/isReactComponent":97,"./validators/validate":98}],65:[function(require,module,exports){
+},{"./asserts/assertNode":22,"./asserts/generated":23,"./builders/flow/createTypeAnnotationBasedOnTypeof":25,"./builders/flow/createUnionTypeAnnotation":26,"./builders/generated":27,"./builders/react/buildChildren":28,"./clone/clone":29,"./clone/cloneDeep":30,"./clone/cloneNode":31,"./clone/cloneWithoutLoc":32,"./comments/addComment":33,"./comments/addComments":34,"./comments/inheritInnerComments":35,"./comments/inheritLeadingComments":36,"./comments/inheritTrailingComments":37,"./comments/inheritsComments":38,"./comments/removeComments":39,"./constants":41,"./constants/generated":40,"./converters/ensureBlock":42,"./converters/toBindingIdentifierName":44,"./converters/toBlock":45,"./converters/toComputedKey":46,"./converters/toExpression":47,"./converters/toIdentifier":48,"./converters/toKeyAlias":49,"./converters/toSequenceExpression":50,"./converters/toStatement":51,"./converters/valueToNode":52,"./definitions":57,"./modifications/appendToMemberExpression":64,"./modifications/flow/removeTypeDuplicates":65,"./modifications/inherits":66,"./modifications/prependToMemberExpression":67,"./modifications/removeProperties":68,"./modifications/removePropertiesDeep":69,"./retrievers/getBindingIdentifiers":70,"./retrievers/getOuterBindingIdentifiers":71,"./traverse/traverse":72,"./traverse/traverseFast":73,"./utils/shallowEqual":76,"./validators/buildMatchMemberExpression":77,"./validators/generated":78,"./validators/is":79,"./validators/isBinding":80,"./validators/isBlockScoped":81,"./validators/isImmutable":82,"./validators/isLet":83,"./validators/isNode":84,"./validators/isNodesEquivalent":85,"./validators/isPlaceholderType":86,"./validators/isReferenced":87,"./validators/isScope":88,"./validators/isSpecifierDefault":89,"./validators/isType":90,"./validators/isValidES3Identifier":91,"./validators/isValidIdentifier":92,"./validators/isVar":93,"./validators/matchesPattern":94,"./validators/react/isCompatTag":95,"./validators/react/isReactComponent":96,"./validators/validate":97}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23050,7 +22788,7 @@ function appendToMemberExpression(member, append, computed = false) {
   member.computed = !!computed;
   return member;
 }
-},{"../builders/generated":28}],66:[function(require,module,exports){
+},{"../builders/generated":27}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23125,7 +22863,7 @@ function removeTypeDuplicates(nodes) {
 
   return types;
 }
-},{"../../validators/generated":79}],67:[function(require,module,exports){
+},{"../../validators/generated":78}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23159,7 +22897,7 @@ function inherits(child, parent) {
   (0, _inheritsComments.default)(child, parent);
   return child;
 }
-},{"../comments/inheritsComments":39,"../constants":42}],68:[function(require,module,exports){
+},{"../comments/inheritsComments":38,"../constants":41}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23173,7 +22911,7 @@ function prependToMemberExpression(member, prepend) {
   member.object = (0, _generated.memberExpression)(prepend, member.object);
   return member;
 }
-},{"../builders/generated":28}],69:[function(require,module,exports){
+},{"../builders/generated":27}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23204,7 +22942,7 @@ function removeProperties(node, opts = {}) {
     node[sym] = null;
   }
 }
-},{"../constants":42}],70:[function(require,module,exports){
+},{"../constants":41}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23222,7 +22960,7 @@ function removePropertiesDeep(tree, opts) {
   (0, _traverseFast.default)(tree, _removeProperties.default, opts);
   return tree;
 }
-},{"../traverse/traverseFast":74,"./removeProperties":69}],71:[function(require,module,exports){
+},{"../traverse/traverseFast":73,"./removeProperties":68}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23326,7 +23064,7 @@ getBindingIdentifiers.keys = {
   VariableDeclaration: ["declarations"],
   VariableDeclarator: ["id"]
 };
-},{"../validators/generated":79}],72:[function(require,module,exports){
+},{"../validators/generated":78}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23341,7 +23079,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function getOuterBindingIdentifiers(node, duplicates) {
   return (0, _getBindingIdentifiers.default)(node, duplicates, true);
 }
-},{"./getBindingIdentifiers":71}],73:[function(require,module,exports){
+},{"./getBindingIdentifiers":70}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23397,7 +23135,7 @@ function traverseSimpleImpl(node, enter, exit, state, ancestors) {
 
   if (exit) exit(node, ancestors, state);
 }
-},{"../definitions":58}],74:[function(require,module,exports){
+},{"../definitions":57}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23426,7 +23164,7 @@ function traverseFast(node, enter, opts) {
     }
   }
 }
-},{"../definitions":58}],75:[function(require,module,exports){
+},{"../definitions":57}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23451,7 +23189,7 @@ function inherit(key, child, parent) {
     child[key] = (0, _uniq().default)([].concat(child[key], parent[key]).filter(Boolean));
   }
 }
-},{"lodash/uniq":243}],76:[function(require,module,exports){
+},{"lodash/uniq":243}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23499,7 +23237,7 @@ function cleanJSXElementLiteralChild(child, args) {
 
   if (str) args.push((0, _generated.stringLiteral)(str));
 }
-},{"../../builders/generated":28}],77:[function(require,module,exports){
+},{"../../builders/generated":27}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23518,7 +23256,7 @@ function shallowEqual(actual, expected) {
 
   return true;
 }
-},{}],78:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23534,7 +23272,7 @@ function buildMatchMemberExpression(match, allowPartial) {
   const parts = match.split(".");
   return member => (0, _matchesPattern.default)(member, parts, allowPartial);
 }
-},{"./matchesPattern":95}],79:[function(require,module,exports){
+},{"./matchesPattern":94}],78:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27852,7 +27590,7 @@ function isSpreadProperty(node, opts) {
 
   return false;
 }
-},{"../../utils/shallowEqual":77}],80:[function(require,module,exports){
+},{"../../utils/shallowEqual":76}],79:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27888,7 +27626,7 @@ function is(type, node, opts) {
     return (0, _shallowEqual.default)(node, opts);
   }
 }
-},{"../definitions":58,"../utils/shallowEqual":77,"./isPlaceholderType":87,"./isType":91}],81:[function(require,module,exports){
+},{"../definitions":57,"../utils/shallowEqual":76,"./isPlaceholderType":86,"./isType":90}],80:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27922,7 +27660,7 @@ function isBinding(node, parent, grandparent) {
 
   return false;
 }
-},{"../retrievers/getBindingIdentifiers":71}],82:[function(require,module,exports){
+},{"../retrievers/getBindingIdentifiers":70}],81:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27939,7 +27677,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function isBlockScoped(node) {
   return (0, _generated.isFunctionDeclaration)(node) || (0, _generated.isClassDeclaration)(node) || (0, _isLet.default)(node);
 }
-},{"./generated":79,"./isLet":84}],83:[function(require,module,exports){
+},{"./generated":78,"./isLet":83}],82:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27966,7 +27704,7 @@ function isImmutable(node) {
 
   return false;
 }
-},{"./generated":79,"./isType":91}],84:[function(require,module,exports){
+},{"./generated":78,"./isType":90}],83:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27981,7 +27719,7 @@ var _constants = require("../constants");
 function isLet(node) {
   return (0, _generated.isVariableDeclaration)(node) && (node.kind !== "var" || node[_constants.BLOCK_SCOPED_SYMBOL]);
 }
-},{"../constants":42,"./generated":79}],85:[function(require,module,exports){
+},{"../constants":41,"./generated":78}],84:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27994,7 +27732,7 @@ var _definitions = require("../definitions");
 function isNode(node) {
   return !!(node && _definitions.VISITOR_KEYS[node.type]);
 }
-},{"../definitions":58}],86:[function(require,module,exports){
+},{"../definitions":57}],85:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28062,7 +27800,7 @@ function isNodesEquivalent(a, b) {
 
   return true;
 }
-},{"../definitions":58}],87:[function(require,module,exports){
+},{"../definitions":57}],86:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28084,7 +27822,7 @@ function isPlaceholderType(placeholderType, targetType) {
 
   return false;
 }
-},{"../definitions":58}],88:[function(require,module,exports){
+},{"../definitions":57}],87:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28197,7 +27935,7 @@ function isReferenced(node, parent, grandparent) {
 
   return true;
 }
-},{}],89:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28222,7 +27960,7 @@ function isScope(node, parent) {
 
   return (0, _generated.isScopable)(node);
 }
-},{"./generated":79}],90:[function(require,module,exports){
+},{"./generated":78}],89:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28237,7 +27975,7 @@ function isSpecifierDefault(specifier) {
     name: "default"
   });
 }
-},{"./generated":79}],91:[function(require,module,exports){
+},{"./generated":78}],90:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28262,7 +28000,7 @@ function isType(nodeType, targetType) {
 
   return false;
 }
-},{"../definitions":58}],92:[function(require,module,exports){
+},{"../definitions":57}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28279,7 +28017,7 @@ const RESERVED_WORDS_ES3_ONLY = new Set(["abstract", "boolean", "byte", "char", 
 function isValidES3Identifier(name) {
   return (0, _isValidIdentifier.default)(name) && !RESERVED_WORDS_ES3_ONLY.has(name);
 }
-},{"./isValidIdentifier":93}],93:[function(require,module,exports){
+},{"./isValidIdentifier":92}],92:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28308,7 +28046,7 @@ function isValidIdentifier(name) {
     return _esutils().default.keyword.isIdentifierNameES6(name);
   }
 }
-},{"esutils":105}],94:[function(require,module,exports){
+},{"esutils":104}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28325,7 +28063,7 @@ function isVar(node) {
     kind: "var"
   }) && !node[_constants.BLOCK_SCOPED_SYMBOL];
 }
-},{"../constants":42,"./generated":79}],95:[function(require,module,exports){
+},{"../constants":41,"./generated":78}],94:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28366,7 +28104,7 @@ function matchesPattern(member, match, allowPartial) {
 
   return true;
 }
-},{"./generated":79}],96:[function(require,module,exports){
+},{"./generated":78}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28377,7 +28115,7 @@ exports.default = isCompatTag;
 function isCompatTag(tagName) {
   return !!tagName && /^[a-z]/.test(tagName);
 }
-},{}],97:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28392,7 +28130,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const isReactComponent = (0, _buildMatchMemberExpression.default)("React.Component");
 var _default = isReactComponent;
 exports.default = _default;
-},{"../buildMatchMemberExpression":78}],98:[function(require,module,exports){
+},{"../buildMatchMemberExpression":77}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28411,7 +28149,7 @@ function validate(node, key, val) {
   if (field.optional && val == null) return;
   field.validate(node, key, val);
 }
-},{"../definitions":58}],99:[function(require,module,exports){
+},{"../definitions":57}],98:[function(require,module,exports){
 'use strict';
 
 const XHTMLEntities = require('./xhtml');
@@ -28854,7 +28592,7 @@ function plugin(options, Parser) {
   };
 }
 
-},{"./xhtml":100,"acorn":101}],100:[function(require,module,exports){
+},{"./xhtml":99,"acorn":100}],99:[function(require,module,exports){
 module.exports = {
   quot: '\u0022',
   amp: '&',
@@ -29111,7 +28849,7 @@ module.exports = {
   diams: '\u2666'
 };
 
-},{}],101:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -34131,7 +33869,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 
-},{}],102:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 /*
   Copyright (C) 2013 Yusuke Suzuki <utatane.tea@gmail.com>
 
@@ -34277,7 +34015,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }());
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{}],103:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 /*
   Copyright (C) 2013-2014 Yusuke Suzuki <utatane.tea@gmail.com>
   Copyright (C) 2014 Ivan Nikulin <ifaaan@gmail.com>
@@ -34414,7 +34152,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }());
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{}],104:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 /*
   Copyright (C) 2013 Yusuke Suzuki <utatane.tea@gmail.com>
 
@@ -34581,7 +34319,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }());
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{"./code":103}],105:[function(require,module,exports){
+},{"./code":102}],104:[function(require,module,exports){
 /*
   Copyright (C) 2013 Yusuke Suzuki <utatane.tea@gmail.com>
 
@@ -34616,7 +34354,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }());
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{"./ast":102,"./code":103,"./keyword":104}],106:[function(require,module,exports){
+},{"./ast":101,"./code":102,"./keyword":103}],105:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -34639,7 +34377,340 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],107:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
+(function (Buffer){
+'use strict';
+
+const object = {};
+const hasOwnProperty = object.hasOwnProperty;
+const forOwn = (object, callback) => {
+	for (const key in object) {
+		if (hasOwnProperty.call(object, key)) {
+			callback(key, object[key]);
+		}
+	}
+};
+
+const extend = (destination, source) => {
+	if (!source) {
+		return destination;
+	}
+	forOwn(source, (key, value) => {
+		destination[key] = value;
+	});
+	return destination;
+};
+
+const forEach = (array, callback) => {
+	const length = array.length;
+	let index = -1;
+	while (++index < length) {
+		callback(array[index]);
+	}
+};
+
+const toString = object.toString;
+const isArray = Array.isArray;
+const isBuffer = Buffer.isBuffer;
+const isObject = (value) => {
+	// This is a very simple check, but it’s good enough for what we need.
+	return toString.call(value) == '[object Object]';
+};
+const isString = (value) => {
+	return typeof value == 'string' ||
+		toString.call(value) == '[object String]';
+};
+const isNumber = (value) => {
+	return typeof value == 'number' ||
+		toString.call(value) == '[object Number]';
+};
+const isFunction = (value) => {
+	return typeof value == 'function';
+};
+const isMap = (value) => {
+	return toString.call(value) == '[object Map]';
+};
+const isSet = (value) => {
+	return toString.call(value) == '[object Set]';
+};
+
+/*--------------------------------------------------------------------------*/
+
+// https://mathiasbynens.be/notes/javascript-escapes#single
+const singleEscapes = {
+	'"': '\\"',
+	'\'': '\\\'',
+	'\\': '\\\\',
+	'\b': '\\b',
+	'\f': '\\f',
+	'\n': '\\n',
+	'\r': '\\r',
+	'\t': '\\t'
+	// `\v` is omitted intentionally, because in IE < 9, '\v' == 'v'.
+	// '\v': '\\x0B'
+};
+const regexSingleEscape = /["'\\\b\f\n\r\t]/;
+
+const regexDigit = /[0-9]/;
+const regexWhitelist = /[ !#-&\(-\[\]-_a-~]/;
+
+const jsesc = (argument, options) => {
+	const increaseIndentation = () => {
+		oldIndent = indent;
+		++options.indentLevel;
+		indent = options.indent.repeat(options.indentLevel)
+	};
+	// Handle options
+	const defaults = {
+		'escapeEverything': false,
+		'minimal': false,
+		'isScriptContext': false,
+		'quotes': 'single',
+		'wrap': false,
+		'es6': false,
+		'json': false,
+		'compact': true,
+		'lowercaseHex': false,
+		'numbers': 'decimal',
+		'indent': '\t',
+		'indentLevel': 0,
+		'__inline1__': false,
+		'__inline2__': false
+	};
+	const json = options && options.json;
+	if (json) {
+		defaults.quotes = 'double';
+		defaults.wrap = true;
+	}
+	options = extend(defaults, options);
+	if (
+		options.quotes != 'single' &&
+		options.quotes != 'double' &&
+		options.quotes != 'backtick'
+	) {
+		options.quotes = 'single';
+	}
+	const quote = options.quotes == 'double' ?
+		'"' :
+		(options.quotes == 'backtick' ?
+			'`' :
+			'\''
+		);
+	const compact = options.compact;
+	const lowercaseHex = options.lowercaseHex;
+	let indent = options.indent.repeat(options.indentLevel);
+	let oldIndent = '';
+	const inline1 = options.__inline1__;
+	const inline2 = options.__inline2__;
+	const newLine = compact ? '' : '\n';
+	let result;
+	let isEmpty = true;
+	const useBinNumbers = options.numbers == 'binary';
+	const useOctNumbers = options.numbers == 'octal';
+	const useDecNumbers = options.numbers == 'decimal';
+	const useHexNumbers = options.numbers == 'hexadecimal';
+
+	if (json && argument && isFunction(argument.toJSON)) {
+		argument = argument.toJSON();
+	}
+
+	if (!isString(argument)) {
+		if (isMap(argument)) {
+			if (argument.size == 0) {
+				return 'new Map()';
+			}
+			if (!compact) {
+				options.__inline1__ = true;
+				options.__inline2__ = false;
+			}
+			return 'new Map(' + jsesc(Array.from(argument), options) + ')';
+		}
+		if (isSet(argument)) {
+			if (argument.size == 0) {
+				return 'new Set()';
+			}
+			return 'new Set(' + jsesc(Array.from(argument), options) + ')';
+		}
+		if (isBuffer(argument)) {
+			if (argument.length == 0) {
+				return 'Buffer.from([])';
+			}
+			return 'Buffer.from(' + jsesc(Array.from(argument), options) + ')';
+		}
+		if (isArray(argument)) {
+			result = [];
+			options.wrap = true;
+			if (inline1) {
+				options.__inline1__ = false;
+				options.__inline2__ = true;
+			}
+			if (!inline2) {
+				increaseIndentation();
+			}
+			forEach(argument, (value) => {
+				isEmpty = false;
+				if (inline2) {
+					options.__inline2__ = false;
+				}
+				result.push(
+					(compact || inline2 ? '' : indent) +
+					jsesc(value, options)
+				);
+			});
+			if (isEmpty) {
+				return '[]';
+			}
+			if (inline2) {
+				return '[' + result.join(', ') + ']';
+			}
+			return '[' + newLine + result.join(',' + newLine) + newLine +
+				(compact ? '' : oldIndent) + ']';
+		} else if (isNumber(argument)) {
+			if (json) {
+				// Some number values (e.g. `Infinity`) cannot be represented in JSON.
+				return JSON.stringify(argument);
+			}
+			if (useDecNumbers) {
+				return String(argument);
+			}
+			if (useHexNumbers) {
+				let hexadecimal = argument.toString(16);
+				if (!lowercaseHex) {
+					hexadecimal = hexadecimal.toUpperCase();
+				}
+				return '0x' + hexadecimal;
+			}
+			if (useBinNumbers) {
+				return '0b' + argument.toString(2);
+			}
+			if (useOctNumbers) {
+				return '0o' + argument.toString(8);
+			}
+		} else if (!isObject(argument)) {
+			if (json) {
+				// For some values (e.g. `undefined`, `function` objects),
+				// `JSON.stringify(value)` returns `undefined` (which isn’t valid
+				// JSON) instead of `'null'`.
+				return JSON.stringify(argument) || 'null';
+			}
+			return String(argument);
+		} else { // it’s an object
+			result = [];
+			options.wrap = true;
+			increaseIndentation();
+			forOwn(argument, (key, value) => {
+				isEmpty = false;
+				result.push(
+					(compact ? '' : indent) +
+					jsesc(key, options) + ':' +
+					(compact ? '' : ' ') +
+					jsesc(value, options)
+				);
+			});
+			if (isEmpty) {
+				return '{}';
+			}
+			return '{' + newLine + result.join(',' + newLine) + newLine +
+				(compact ? '' : oldIndent) + '}';
+		}
+	}
+
+	const string = argument;
+	// Loop over each code unit in the string and escape it
+	let index = -1;
+	const length = string.length;
+	result = '';
+	while (++index < length) {
+		const character = string.charAt(index);
+		if (options.es6) {
+			const first = string.charCodeAt(index);
+			if ( // check if it’s the start of a surrogate pair
+				first >= 0xD800 && first <= 0xDBFF && // high surrogate
+				length > index + 1 // there is a next code unit
+			) {
+				const second = string.charCodeAt(index + 1);
+				if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+					// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+					const codePoint = (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+					let hexadecimal = codePoint.toString(16);
+					if (!lowercaseHex) {
+						hexadecimal = hexadecimal.toUpperCase();
+					}
+					result += '\\u{' + hexadecimal + '}';
+					++index;
+					continue;
+				}
+			}
+		}
+		if (!options.escapeEverything) {
+			if (regexWhitelist.test(character)) {
+				// It’s a printable ASCII character that is not `"`, `'` or `\`,
+				// so don’t escape it.
+				result += character;
+				continue;
+			}
+			if (character == '"') {
+				result += quote == character ? '\\"' : character;
+				continue;
+			}
+			if (character == '`') {
+				result += quote == character ? '\\`' : character;
+				continue;
+			}
+			if (character == '\'') {
+				result += quote == character ? '\\\'' : character;
+				continue;
+			}
+		}
+		if (
+			character == '\0' &&
+			!json &&
+			!regexDigit.test(string.charAt(index + 1))
+		) {
+			result += '\\0';
+			continue;
+		}
+		if (regexSingleEscape.test(character)) {
+			// no need for a `hasOwnProperty` check here
+			result += singleEscapes[character];
+			continue;
+		}
+		const charCode = character.charCodeAt(0);
+		if (options.minimal && charCode != 0x2028 && charCode != 0x2029) {
+			result += character;
+			continue;
+		}
+		let hexadecimal = charCode.toString(16);
+		if (!lowercaseHex) {
+			hexadecimal = hexadecimal.toUpperCase();
+		}
+		const longhand = hexadecimal.length > 2 || json;
+		const escaped = '\\' + (longhand ? 'u' : 'x') +
+			('0000' + hexadecimal).slice(longhand ? -4 : -2);
+		result += escaped;
+		continue;
+	}
+	if (options.wrap) {
+		result = quote + result + quote;
+	}
+	if (quote == '`') {
+		result = result.replace(/\$\{/g, '\\\$\{');
+	}
+	if (options.isScriptContext) {
+		// https://mathiasbynens.be/notes/etago
+		return result
+			.replace(/<\/(script|style)/gi, '<\\/$1')
+			.replace(/<!--/g, json ? '\\u003C!--' : '\\x3C!--');
+	}
+	return result;
+};
+
+jsesc.version = '2.5.2';
+
+module.exports = jsesc;
+
+}).call(this,{"isBuffer":require("../is-buffer/index.js")})
+},{"../is-buffer/index.js":105}],107:[function(require,module,exports){
 var getNative = require('./_getNative'),
     root = require('./_root');
 

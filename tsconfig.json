@@ -40,7 +40,7 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "src/server.ts",
-    "types/acorn-jsx.d.ts"
+    "types/acorn-jsx.d.ts", "src/index.jsx"
   ],
   "exclude": [
     "node_modules"
