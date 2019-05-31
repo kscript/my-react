@@ -2,7 +2,7 @@ import typescript from "rollup-plugin-typescript";
 import jsx from "rollup-plugin-jsx";
 // import babel from "rollup-plugin-babel";
 export default {
-    input: 'src/index.js',
+    input: 'src/main.jsx',
     output: {
         file: 'bundle.js',
         format: 'cjs'
@@ -13,7 +13,11 @@ export default {
             "sourceMap": false
         }),
         jsx({
-            factory: 'React.createElement'
+            arrayChildren: true,
+            factory: 'React.createElement',
+            // spreadFn: 'React.createAttribute',
+            unknownTagPattern: 'React.createComponent({tag})',
+            // passUnknownTagsToFactory: "React.createUnknownTag"
         }),
         // babel()
     ]

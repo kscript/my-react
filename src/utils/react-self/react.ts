@@ -18,6 +18,7 @@ let specialPropKeyWarningShown: boolean, specialPropRefWarningShown: Boolean;
 let __DEV__ = true;
 let rid = 1;
 export const createElement =  (type: AnyObject & Function, config: AnyObject | null, children: any[]) => {
+    console.log(type, config, children);
     let propName;
     let props: AnyObject = {};
     let key = null;
@@ -196,8 +197,18 @@ export const ReactElement = (type: AnyObject, key: string | null, ref: string | 
 export class Component {
     private state: AnyObject = {};
     private rid: number = 1;
+    private tree: AnyObject = {};
+    private nodeList: AnyObject[] = [];
     constructor() {
         this.rid = rid++;
+    }
+    public render(): AnyObject {
+        return {
+            root: {}
+        }
+    }
+    public mount (){
+        return this.render();
     }
     public setState(set: any): void {
         if (typeof set !== 'function') {
