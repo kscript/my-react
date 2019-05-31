@@ -39,7 +39,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "src/server.jsx",
+    "server/server.jsx",
     "types/acorn-jsx.d.ts", "src/index.jsx"
   ],
   "exclude": [

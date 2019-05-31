@@ -7,11 +7,27 @@ import bodyParser from 'koa-bodyparser'
 
 const config = {
     port: 12301,
+    template: '/public/index.html',
     publicUrl: '/dist/'
 };
-
 const app = new Koa();
 const router = new Router();
+const index = fs.readFileSync(path.join(process.cwd(), config.template), 'utf8');
+
+let writed = false;
+const writeFile = async () => {
+    let dir = path.join(process.cwd(), config.publicUrl)
+    if (!writed) {
+        writed = !!1;
+        let exists = await fs.exists(dir);
+        if (!exists){
+            fs.mkdir(dir);
+        }
+        await fs.writeFile(path.join(dir, 'index.html'), index);
+    }
+    await fs.readFile(path.join(dir, 'index.html'), 'utf8');
+}
+writeFile();
 
 app.use(bodyParser({}));
 app.use(serve(
@@ -27,7 +43,7 @@ router.get('/:name', async (ctx, next) => {
 
 router.get('/', async (ctx, next) => {
     ctx.response.type = 'html';
-    ctx.response.body = await fs.readFile(path.join(process.cwd(), 'public', 'index.html'), 'utf8');
+    ctx.response.body = await writeFile();
 });
 
 app.use(router.routes());

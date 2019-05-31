@@ -1,21 +1,23 @@
 import React from '@/utils/react';
 export default class Test extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+        console.log(this);
         this.state = {
-            data: {
-                text: 12
-            }
-        }
+            text: 12
+        };
+    }
+    btnClick () {
+        this.setState({
+            text: 12345
+        });
+    }
+    componentDidMount() {
     }
     render() {
         return (<div className="test">
-            <span>{this.state.data.text}</span>
-            {this.state.data.text}
-            <bar text={this.state.data.text} test="text">
-                <span><span>1</span></span>
-                <div><span>111</span></div>
-            </bar>
+            {this.state.text}
+            <button onClick={this.btnClick}>点击事件</button>
         </div>)
     }
 }
