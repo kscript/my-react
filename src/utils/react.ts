@@ -49,7 +49,6 @@ const componentUpdate = (instance: AnyObject) => {
     if (!instance.shouldComponentUpdate(instance.props)){
         return instance
     }
-    instance.components = []
     let parentNode
     if (instance.parent instanceof HTMLElement) {
         parentNode = instance.parent
@@ -63,6 +62,7 @@ const componentUpdate = (instance: AnyObject) => {
 export class Component {
     private state: AnyObject = {};
     private _id: number = 1;
+    private indicator: number = 0;
     private vdom: vdom = {};
     private props: AnyObject = {}
     private parent: HTMLElement | vdom = {}
@@ -84,29 +84,17 @@ export class Component {
     }
     public componentDidUpdate  (props: AnyObject) {
     }
-    // public update(){
-    //     if (!this.shouldComponentUpdate(this.props)){
-    //         return this
-    //     }
-    //     let parentNode
-    //     if (this.parent instanceof HTMLElement) {
-    //         parentNode = this.parent
-    //     } else {
-    //         parentNode = this.parent.vdom.node
-    //     }
-    //     return this.mount(parentNode, this.vdom.node)
-    // }
     public render(): AnyObject {
         return {
             node: document.createElement("div")
         };
     }
     public mount (node?: AnyObject | HTMLElement, oldNode?: HTMLElement){
-        // 
         if(node && isEmpty(this.parent)) {
             this.parent = node;
             rootNode = rootNode || node
         }
+        this.indicator = 0;
         if (!oldNode) {
             this.componentWillMount(this.props);
         }
@@ -119,6 +107,7 @@ export class Component {
             node && node.appendChild(this.vdom.node);
             this.componentDidMount(this.props);
         }
+        this.indicator = 0;
         return this;
     }
     public setState(set: any, callBack: Function): void {
@@ -135,9 +124,12 @@ export const React: AnyObject = {
     Component,
     // this指向父组件
     createComponent (Component: any) {
-        let instance = new Component();
-        instance.parent = this;
-        this.components.push(instance);
+        let instance = this.components[this.indicator++];
+        if (!instance) {
+            instance = new Component();
+            instance.parent = this;
+            this.components.push(instance);
+        }
         return (props: AnyObject, config: AnyObject | null, children: any[]) => {
             instance.props = props;
             return componentUpdate(instance).vdom;

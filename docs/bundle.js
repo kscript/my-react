@@ -46,7 +46,6 @@ var componentUpdate = function (instance) {
     if (!instance.shouldComponentUpdate(instance.props)) {
         return instance;
     }
-    instance.components = [];
     var parentNode;
     if (instance.parent instanceof HTMLElement) {
         parentNode = instance.parent;
@@ -63,6 +62,7 @@ var Component = /** @class */ (function () {
     function Component(props) {
         this.state = {};
         this._id = 1;
+        this.indicator = 0;
         this.vdom = {};
         this.props = {};
         this.parent = {};
@@ -81,29 +81,17 @@ var Component = /** @class */ (function () {
     };
     Component.prototype.componentDidUpdate = function (props) {
     };
-    // public update(){
-    //     if (!this.shouldComponentUpdate(this.props)){
-    //         return this
-    //     }
-    //     let parentNode
-    //     if (this.parent instanceof HTMLElement) {
-    //         parentNode = this.parent
-    //     } else {
-    //         parentNode = this.parent.vdom.node
-    //     }
-    //     return this.mount(parentNode, this.vdom.node)
-    // }
     Component.prototype.render = function () {
         return {
             node: document.createElement("div")
         };
     };
     Component.prototype.mount = function (node, oldNode) {
-        //
         if (node && isEmpty(this.parent)) {
             this.parent = node;
             rootNode = rootNode || node;
         }
+        this.indicator = 0;
         if (!oldNode) {
             this.componentWillMount(this.props);
         }
@@ -117,6 +105,7 @@ var Component = /** @class */ (function () {
             node && node.appendChild(this.vdom.node);
             this.componentDidMount(this.props);
         }
+        this.indicator = 0;
         return this;
     };
     Component.prototype.setState = function (set, callBack) {
@@ -135,9 +124,12 @@ var React = {
     Component: Component,
     // this指向父组件
     createComponent: function (Component) {
-        var instance = new Component();
-        instance.parent = this;
-        this.components.push(instance);
+        var instance = this.components[this.indicator++];
+        if (!instance) {
+            instance = new Component();
+            instance.parent = this;
+            this.components.push(instance);
+        }
         return function (props, config, children) {
             instance.props = props;
             return componentUpdate(instance).vdom;
