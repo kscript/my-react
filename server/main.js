@@ -12,7 +12,7 @@ var bodyParser = _interopDefault(require('koa-bodyparser'));
 const config = {
     port: 12301,
     template: '/public/index.html',
-    publicUrl: '/dist/'
+    publicUrl: '/docs/'
 };
 const app = new Koa();
 const router = new Router();

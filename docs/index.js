@@ -1,4 +1,3 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
 var _id = 1;
@@ -35,11 +34,29 @@ var bindAttribute = function (instance, node, props) {
             else if (key === 'className') {
                 node.setAttribute('class', props[key]);
             }
+            else if (key === 'ref') ;
             else {
                 node.setAttribute(key, props[key]);
             }
         }
     }
+};
+var componentUpdate = function (instance) {
+    if (!instance.shouldComponentUpdate(instance.props)) {
+        return instance;
+    }
+    instance.components = [];
+    var parentNode;
+    if (instance.parent instanceof HTMLElement) {
+        parentNode = instance.parent;
+    }
+    else if (instance.vdom.node) {
+        parentNode = instance.vdom.node.parentNode;
+    }
+    else {
+        parentNode = instance.parent.vdom.node;
+    }
+    return instance.mount(parentNode, instance.vdom.node);
 };
 var Component = /** @class */ (function () {
     function Component(props) {
@@ -56,20 +73,25 @@ var Component = /** @class */ (function () {
     };
     Component.prototype.componentDidMount = function (props) {
     };
+    Component.prototype.shouldComponentUpdate = function (props) {
+        return true;
+    };
     Component.prototype.componentWillUpdate = function (props) {
     };
     Component.prototype.componentDidUpdate = function (props) {
     };
-    Component.prototype.update = function () {
-        var parentNode;
-        if (this.parent instanceof HTMLElement) {
-            parentNode = this.parent;
-        }
-        else {
-            parentNode = this.parent.vdom.node;
-        }
-        return this.mount(parentNode, this.vdom.node);
-    };
+    // public update(){
+    //     if (!this.shouldComponentUpdate(this.props)){
+    //         return this
+    //     }
+    //     let parentNode
+    //     if (this.parent instanceof HTMLElement) {
+    //         parentNode = this.parent
+    //     } else {
+    //         parentNode = this.parent.vdom.node
+    //     }
+    //     return this.mount(parentNode, this.vdom.node)
+    // }
     Component.prototype.render = function () {
         return {
             node: document.createElement("div")
@@ -96,14 +118,15 @@ var Component = /** @class */ (function () {
         }
         return this;
     };
-    Component.prototype.setState = function (set) {
+    Component.prototype.setState = function (set, callBack) {
         if (typeof set !== 'function') {
             for (var _i = 0, _a = Object.keys(set); _i < _a.length; _i++) {
                 var key = _a[_i];
                 this.state[key] = set[key];
             }
         }
-        this.update();
+        componentUpdate(this);
+        typeof callBack === 'function' && callBack.call(this);
     };
     return Component;
 }());
@@ -116,7 +139,7 @@ var React = {
         this.components.push(instance);
         return function (props, config, children) {
             instance.props = props;
-            return instance.update().vdom;
+            return componentUpdate(instance).vdom;
         };
     },
     createElement: function (tag, props, children) {
@@ -156,35 +179,45 @@ var React = {
             children[_i - 2] = arguments[_i];
         }
         console.log(tag, props, children);
-    },
-    createUnknownTag: function (tag, props) {
-        var children = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            children[_i - 2] = arguments[_i];
-        }
-        console.log(tag, props, children);
-    },
+    }
 };
 
-class Test extends React.Component {
-    constructor(props) {
-        super(props);
-        console.log(this);
+class Nav extends React.Component {
+    constructor() {
+        super();
+        this.shouldUpdate = true;
         this.state = {
-            text: 12
+            text: '12345',
+            show: false,
         };
     }
-    btnClick () {
+    shouldComponentUpdate(props) {
+        return this.shouldUpdate;
+    }
+    inputChange(e) {
+        this.shouldUpdate = false;
         this.setState({
-            text: 12345
+            text: e.target.value
+        }, () => {
+            this.shouldUpdate = true;
+        });
+    }
+    btnClick() {
+        this.setState({
+            show: true
         });
     }
     componentDidMount() {
     }
     render() {
-        return (React.createElement.bind(this)('div', {className: "test"}, [
-            this.state.text,
-            React.createElement.bind(this)('button', {onClick: this.btnClick}, ["点击事件"])
+        return (React.createElement.bind(this)('nav', {className: "test"}, [
+            React.createElement.bind(this)('span', null, [
+
+                    this.state.show ? this.state.text : "hello world"
+
+            ]),
+            React.createElement.bind(this)('input', {type: "text", onChange: this.inputChange.bind(this)}),
+            React.createElement.bind(this)('button', {onClick: this.btnClick}, ["修改"])
         ]))
     }
 }
@@ -192,12 +225,14 @@ class Test extends React.Component {
 // 项目入口文件
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     console.log(this);
     this.state = {
       loading: true,
-      text: 'loading'
+      title: '测试',
+      mode: 'normal',
+      logo: "/logo.png"
     };
   }
   componentDidMount (props) {
@@ -210,11 +245,11 @@ class App extends React.Component {
   }
   render() {
     return (React.createElement.bind(this)('span', null, [
-      React.createComponent.call(this, Test)({text: this.state.text}, ["123"]),
-      this.state.text,
-      React.createElement.bind(this)('bar', {init: !this.state.loading, test: "text"}, [
-        React.createElement.bind(this)('span', null, [React.createElement.bind(this)('span', null, ["1"])]),
-        React.createElement.bind(this)('div', null, [React.createElement.bind(this)('span', null, ["111"])])
+      React.createElement.bind(this)('header', null, [
+        React.createComponent.call(this, Nav)({logo: this.state.logo, className: "nav"})
+      ]),
+      React.createElement.bind(this)('main', {className: this.state.mode}, [
+        React.createElement.bind(this)('div', null, [this.state.title])
       ])
     ]))
   }
@@ -222,5 +257,3 @@ class App extends React.Component {
 
 // 编译 入口文件
 new App().mount(document.getElementById("app"));
-
-},{}]},{},[1]);

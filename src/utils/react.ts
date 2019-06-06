@@ -27,6 +27,9 @@ const bindEvent = (instance: AnyObject, node: HTMLElement, type: string, listene
         }
     }) 
 }
+const bindRef = (instance: AnyObject) => {
+
+}
 const bindAttribute = (instance: AnyObject, node: HTMLElement, props: AnyObject | null) => {
     if (props instanceof Object) {
         for(let key in props) {
@@ -34,13 +37,29 @@ const bindAttribute = (instance: AnyObject, node: HTMLElement, props: AnyObject 
                 bindEvent(instance, node,  key.toLowerCase(), props[key])
             } else if (key === 'className'){
                 node.setAttribute('class', props[key])
+            } else if(key === 'ref'){
+                bindRef(instance)
             } else {
                 node.setAttribute(key, props[key])
             }
         }
     }
 }
-
+const componentUpdate = (instance: AnyObject) => {
+    if (!instance.shouldComponentUpdate(instance.props)){
+        return instance
+    }
+    instance.components = []
+    let parentNode
+    if (instance.parent instanceof HTMLElement) {
+        parentNode = instance.parent
+    } else if (instance.vdom.node){
+        parentNode = instance.vdom.node.parentNode
+    } else {
+        parentNode = instance.parent.vdom.node
+    }
+    return instance.mount(parentNode, instance.vdom.node)
+}
 export class Component {
     private state: AnyObject = {};
     private _id: number = 1;
@@ -58,19 +77,25 @@ export class Component {
     public componentDidMount (props: AnyObject){
 
     }
+    public shouldComponentUpdate(props: AnyObject){
+        return true
+    }
     public componentWillUpdate (props: AnyObject) {
     }
     public componentDidUpdate  (props: AnyObject) {
     }
-    public update(){
-        let parentNode
-        if (this.parent instanceof HTMLElement) {
-            parentNode = this.parent
-        } else {
-            parentNode = this.parent.vdom.node
-        }
-        return this.mount(parentNode, this.vdom.node)
-    }
+    // public update(){
+    //     if (!this.shouldComponentUpdate(this.props)){
+    //         return this
+    //     }
+    //     let parentNode
+    //     if (this.parent instanceof HTMLElement) {
+    //         parentNode = this.parent
+    //     } else {
+    //         parentNode = this.parent.vdom.node
+    //     }
+    //     return this.mount(parentNode, this.vdom.node)
+    // }
     public render(): AnyObject {
         return {
             node: document.createElement("div")
@@ -96,13 +121,14 @@ export class Component {
         }
         return this;
     }
-    public setState(set: any): void {
+    public setState(set: any, callBack: Function): void {
         if (typeof set !== 'function') {
             for (const key of Object.keys(set)) {
                 this.state[key] = set[key];
             }
         }
-        this.update()
+        componentUpdate(this);
+        typeof callBack === 'function' && callBack.call(this);
     }
 }
 export const React: AnyObject = {
@@ -114,7 +140,7 @@ export const React: AnyObject = {
         this.components.push(instance);
         return (props: AnyObject, config: AnyObject | null, children: any[]) => {
             instance.props = props;
-            return instance.update().vdom;
+            return componentUpdate(instance).vdom;
         }
     },
     createElement (tag: any, props: AnyObject | null, children: any[]) {
@@ -149,9 +175,6 @@ export const React: AnyObject = {
     },
     createAttribute (tag: any, props: AnyObject | null, ...children: any[]) {
         console.log(tag, props, children);
-    },
-    createUnknownTag (tag: any, props: AnyObject | null, ...children: any[]) {
-        console.log(tag, props, children);
-    },
+    }
 };
 export default React;

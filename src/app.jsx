@@ -1,14 +1,16 @@
 // 项目入口文件
 import React from '@/utils/react';
-import Test from '@/components/test';
+import Nav from '@/components/nav';
 
 export default class App extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     console.log(this)
     this.state = {
       loading: true,
-      text: 'loading'
+      title: '测试',
+      mode: 'normal',
+      logo: "/logo.png"
     }
   }
   componentDidMount (props) {
@@ -21,12 +23,12 @@ export default class App extends React.Component {
   }
   render() {
     return (<span>
-      <Test text={this.state.text}>123</Test>
-      {this.state.text}
-      <bar init={!this.state.loading} test="text">
-        <span><span>1</span></span>
-        <div><span>111</span></div>
-      </bar>
+      <header>
+        <Nav logo={this.state.logo} className="nav"></Nav>
+      </header>
+      <main className={this.state.mode}>
+        <div>{this.state.title}</div>
+      </main>
     </span>)
   }
 }

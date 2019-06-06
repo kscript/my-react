@@ -15,9 +15,8 @@ export default {
         jsx({
             arrayChildren: true,
             factory: 'React.createElement.bind(this)',
-            spreadFn: 'React.createAttribute',
-            unknownTagPattern: 'React.createComponent.call(this, {tag})',
-            // passUnknownTagsToFactory: "React.createUnknownTag"
+            spreadFn: 'Object.assign',
+            unknownTagPattern: 'React.createComponent.call(this, {tag})'
         }),
         // babel()
     ]
