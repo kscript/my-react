@@ -15,11 +15,10 @@ export default class Nav extends React.Component {
         this.shouldUpdate = false;
         this.setState({
             text: e.target.value
-        }, () => {
-            this.shouldUpdate = true;
-        })
+        });
     }
     btnClick() {
+        this.shouldUpdate = true;
         this.setState({
             show: true
         });
@@ -28,12 +27,13 @@ export default class Nav extends React.Component {
     }
     render() {
         return (<nav className="test">
+            {this.props.logo}
             <span>
                 {
                     this.state.show ? this.state.text : "hello world"
                 }
             </span>
-            <input type="text" onChange={this.inputChange.bind(this)} />
+            <input type="text" onInput={this.inputChange.bind(this)} value={this.state.text} ref="input"/>
             <button onClick={this.btnClick}>修改</button>
         </nav>)
     }

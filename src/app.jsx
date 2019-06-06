@@ -14,12 +14,12 @@ export default class App extends React.Component {
     }
   }
   componentDidMount (props) {
-    // setTimeout(() => {
-    //   this.setState({
-    //     text: 'hello world!',
-    //     loading: false
-    //   })
-    // }, 5000)
+    setTimeout(() => {
+      this.setState({
+        title: 'hello world!',
+        loading: false
+      })
+    }, 5000)
   }
   render() {
     return (<span>
