@@ -34,13 +34,14 @@
     ]
   },
   "include": [
+    "lib/**/*.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "server/server.jsx",
-    "types/acorn-jsx.d.ts", "src/index.jsx"
+    "src/index.jsx"
   ],
   "exclude": [
     "node_modules"

@@ -265,6 +265,8 @@ var React = {
     }
 };
 
+// import React from 'ks-react';
+
 class Nav extends React.Component {
     constructor() {
         super();
@@ -339,6 +341,7 @@ class App extends React.Component {
 }
 
 // 编译 入口文件
+// 实例化一个入口, 并将入口实例挂载到dom元素上
 new App().mount(document.getElementById("app"));
 
 },{}]},{},[1]);

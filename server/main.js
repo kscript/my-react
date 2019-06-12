@@ -3,9 +3,9 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var Koa = _interopDefault(require('koa'));
-var fs = _interopDefault(require('fs.promised'));
+var fs = require('fs.promised');
 var path = _interopDefault(require('path'));
-var Router = _interopDefault(require('koa-router'));
+var Router = require('koa-router');
 var serve = _interopDefault(require('koa-static'));
 var bodyParser = _interopDefault(require('koa-bodyparser'));
 

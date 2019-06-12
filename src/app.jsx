@@ -1,5 +1,5 @@
 // 项目入口文件
-import React from '@/utils/react';
+import React from '@/react';
 import Nav from '@/components/nav';
 
 export default class App extends React.Component {

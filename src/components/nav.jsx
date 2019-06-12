@@ -1,4 +1,4 @@
-import React from '@/utils/react';
+import React from '@/react';
 export default class Nav extends React.Component {
     constructor() {
         super();

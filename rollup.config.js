@@ -1,7 +1,12 @@
 import typescript from "rollup-plugin-typescript";
 import jsx from "rollup-plugin-jsx";
+import replace from 'rollup-plugin-replace';
+import { uglify } from 'rollup-plugin-uglify'
+import uglifyES from "uglify-es";
 // import babel from "rollup-plugin-babel";
-export default {
+
+const env = process.env.NODE_ENV;
+const config = {
     input: 'src/main.jsx',
     output: {
         file: 'bundle.js',
@@ -18,6 +23,13 @@ export default {
             spreadFn: 'Object.assign',
             unknownTagPattern: 'React.createComponent.call(this, {tag})'
         }),
-        // babel()
-    ]
+        // babel(),
+        replace({
+            ENV: JSON.stringify(process.env.NODE_ENV || 'production'),
+        }),
+    ].concat(
+        // process.env.NODE_ENV !== 'production' ? uglify({}, uglifyES) : []
+    )
 };
+
+export default config;

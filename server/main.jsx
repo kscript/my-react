@@ -1,7 +1,7 @@
 import Koa from 'koa';
-import fs from 'fs.promised';
+import * as fs from 'fs.promised';
 import path from 'path';
-import Router from 'koa-router';
+import * as Router from 'koa-router';
 import serve from 'koa-static';
 import bodyParser from 'koa-bodyparser'
 
