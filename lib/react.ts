@@ -1,5 +1,5 @@
 import { isEmpty, getType, execFunc } from './common';
-import { diff, componentUpdate, bindEvent, bindAttribute, destroy } from './instance';
+import { diff, componentUpdate, connectEvent, bindAttribute, destroy } from './instance';
 import Events from './events'
 
 interface vdom {
@@ -12,6 +12,17 @@ interface refs {
 
 let _id: number = 1;
 let events: Events;
+
+class Vdom {
+    public tag: string = '';
+    public children: any[] = [];
+    public props: AnyObject = {};
+    public node: HTMLElement | undefined;
+    public bindData: AnyObject = {};
+    constructor(option: AnyObject = {}){
+        Object.assign(this, option);
+    }
+}
 
 export class Component {
     private state: AnyObject = {};
@@ -57,11 +68,13 @@ export class Component {
         };
     }
     public mount (node?: AnyObject | HTMLElement, oldNode?: HTMLElement){
+        // 根节点
         if(node && isEmpty(this.parent)) {
             this.parent = node;
+            // 用根节点来初始化一个事件管理类
             if (!events && node instanceof HTMLElement) {
                 events = new Events(node);
-                bindEvent(this, events);
+                connectEvent(this, events);
             }
         }
         this.indicator = 0;
@@ -90,6 +103,7 @@ export class Component {
         typeof callBack === 'function' && callBack.call(this);
     }
 }
+
 export const React: AnyObject = {
     Component,
     // this指向父组件
@@ -102,45 +116,60 @@ export const React: AnyObject = {
         }
         return (props: AnyObject, config: AnyObject | null, children: any[]) => {
             instance.props = props;
-            let vdom = componentUpdate(instance).vdom;
+            let newInstance = componentUpdate(instance)
+            let vdom = newInstance.vdom;
+            vdom.bindData = bindAttribute(this, vdom.node, props, instance);
             vdom.parent = this.vdom;
             return vdom;
         }
     },
     createElement (tag: any, props: AnyObject | null, children: any[]) {
         let node = null;
-        let list: any[] = [];
-        let fragment = document.createDocumentFragment()
+        let fragment = document.createDocumentFragment();
+        let bindData;
         props = props instanceof Object ? props : {};
-        children && children.forEach(item => {
-            if (item instanceof Object) {
-                if (typeof item.tag === 'string') {
-                    list.push(item.node);
-                    fragment.appendChild(item.node);
-                }
-            } else if (typeof item === 'string' || typeof item === 'number') {
-                let Text = document.createTextNode(String(item));
-                list.push(Text);
-                fragment.appendChild(Text);
-            }
-        });
+        if (children) {
+            children = React.createChild(children, fragment);
+        }
         if (typeof tag === 'string') {
             node = document.createElement(tag);
             node.appendChild(fragment);
-            bindAttribute(this, node, props)
+            bindData = bindAttribute(this, node, props)
         }
-        let result = {
+        let result = new Vdom({
             tag,
             props,
-            list,
             node,
+            bindData,
             children
-        }
+        })
         result.children = (children || []).map(item => {
             if (item instanceof Object) {
                 item.parent = result;
             }
             return item;
+        });
+        return result;
+    },
+    createChild(children: AnyObject[], fragment: DocumentFragment) {
+        let result: AnyObject[] = [];
+        children.forEach((item: any) => {
+            if (Array.isArray(item)) {
+                item.forEach(child => {
+                    result.push(child);
+                    fragment.appendChild(child.node);
+                })
+            } else {
+                result.push(item);
+                if (item instanceof Object) {
+                    if (typeof item.tag === 'string') {
+                        fragment.appendChild(item.node);
+                    }
+                } else if (typeof item === 'string' || typeof item === 'number') {
+                    let Text = document.createTextNode(String(item));
+                    fragment.appendChild(Text);
+                }
+            }
         });
         return result;
     },

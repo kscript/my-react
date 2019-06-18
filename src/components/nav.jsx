@@ -33,7 +33,7 @@ export default class Nav extends React.Component {
                     this.state.show ? this.state.text : "hello world"
                 }
             </span>
-            <input type="text" onInput={this.inputChange.bind(this)} value={this.state.text} ref="input"/>
+            <input type="text" onInput={this.inputChange} value={this.state.text} ref="input"/>
             <button onClick={this.btnClick}>修改</button>
         </nav>)
     }

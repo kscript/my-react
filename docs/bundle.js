@@ -70,7 +70,7 @@ var destroy = function (instance) {
         }
     }
 };
-var bindEvent = function (instance, _events) {
+var connectEvent = function (instance, _events) {
     events = _events;
 };
 var bindRef = function (instance, handler, node) {
@@ -85,11 +85,16 @@ var bindRef = function (instance, handler, node) {
         }
     }
 };
-var bindAttribute = function (instance, node, props) {
+var bindAttribute = function (instance, node, props, child) {
+    var bindData = [];
     if (props instanceof Object) {
         for (var key in props) {
+            bindData.push({
+                key: key,
+                value: props[key]
+            });
             if (/^on[A-Z].*$/.test(key)) {
-                events.bindEvent(instance, node, key.toLowerCase(), props[key]);
+                events.bindEvent(instance, node, key.toLowerCase(), props[key], child);
             }
             else if (key === 'className') {
                 node.setAttribute('class', props[key]);
@@ -102,20 +107,38 @@ var bindAttribute = function (instance, node, props) {
             }
         }
     }
+    return bindData;
 };
 
 var Events = /** @class */ (function () {
     function Events(rootNode) {
+        this.quque = {};
         this.rootNode = rootNode;
     }
     Events.prototype.addEvent = function (type, listener) {
         this.rootNode.addEventListener(type.slice(2), listener);
     };
-    Events.prototype.bindEvent = function (instance, node, type, listener) {
+    Events.prototype.bindEvent = function (instance, node, type, listener, child) {
+        // let queue = this.quque[type] = this.quque[type] || [];
+        // queue.push({
+        //     node,
+        //     instance,
+        //     listener
+        // });
+        // if (queue.length > 1) {
+        //     return ;
+        // }
         this.addEvent(type, function (e) {
-            if (e.target === node) {
-                listener.call(instance, e);
+            var rest = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                rest[_i - 1] = arguments[_i];
             }
+            // queue.forEach((item: AnyObject) => {
+            if (e.target === node) {
+                // listener.bind(instance, e, ...rest)();
+                listener.call.apply(listener, [instance, e].concat(rest));
+            }
+            // });
         });
     };
     return Events;
@@ -123,6 +146,17 @@ var Events = /** @class */ (function () {
 
 var _id = 1;
 var events$1;
+var Vdom = /** @class */ (function () {
+    function Vdom(option) {
+        if (option === void 0) { option = {}; }
+        this.tag = '';
+        this.children = [];
+        this.props = {};
+        this.bindData = {};
+        Object.assign(this, option);
+    }
+    return Vdom;
+}());
 var Component = /** @class */ (function () {
     function Component(props) {
         this.state = {};
@@ -164,11 +198,13 @@ var Component = /** @class */ (function () {
         };
     };
     Component.prototype.mount = function (node, oldNode) {
+        // 根节点
         if (node && isEmpty(this.parent)) {
             this.parent = node;
+            // 用根节点来初始化一个事件管理类
             if (!events$1 && node instanceof HTMLElement) {
                 events$1 = new Events(node);
-                bindEvent(this, events$1);
+                connectEvent(this, events$1);
             }
         }
         this.indicator = 0;
@@ -213,46 +249,62 @@ var React = {
         }
         return function (props, config, children) {
             instance.props = props;
-            var vdom = componentUpdate(instance).vdom;
+            var newInstance = componentUpdate(instance);
+            var vdom = newInstance.vdom;
+            vdom.bindData = bindAttribute(_this, vdom.node, props, instance);
             vdom.parent = _this.vdom;
             return vdom;
         };
     },
     createElement: function (tag, props, children) {
         var node = null;
-        var list = [];
         var fragment = document.createDocumentFragment();
+        var bindData;
         props = props instanceof Object ? props : {};
-        children && children.forEach(function (item) {
-            if (item instanceof Object) {
-                if (typeof item.tag === 'string') {
-                    list.push(item.node);
-                    fragment.appendChild(item.node);
-                }
-            }
-            else if (typeof item === 'string' || typeof item === 'number') {
-                var Text = document.createTextNode(String(item));
-                list.push(Text);
-                fragment.appendChild(Text);
-            }
-        });
+        if (children) {
+            children = React.createChild(children, fragment);
+        }
         if (typeof tag === 'string') {
             node = document.createElement(tag);
             node.appendChild(fragment);
-            bindAttribute(this, node, props);
+            bindData = bindAttribute(this, node, props);
         }
-        var result = {
+        var result = new Vdom({
             tag: tag,
             props: props,
-            list: list,
             node: node,
+            bindData: bindData,
             children: children
-        };
+        });
         result.children = (children || []).map(function (item) {
             if (item instanceof Object) {
                 item.parent = result;
             }
             return item;
+        });
+        return result;
+    },
+    createChild: function (children, fragment) {
+        var result = [];
+        children.forEach(function (item) {
+            if (Array.isArray(item)) {
+                item.forEach(function (child) {
+                    result.push(child);
+                    fragment.appendChild(child.node);
+                });
+            }
+            else {
+                result.push(item);
+                if (item instanceof Object) {
+                    if (typeof item.tag === 'string') {
+                        fragment.appendChild(item.node);
+                    }
+                }
+                else if (typeof item === 'string' || typeof item === 'number') {
+                    var Text = document.createTextNode(String(item));
+                    fragment.appendChild(Text);
+                }
+            }
         });
         return result;
     },
@@ -301,10 +353,18 @@ class Nav extends React.Component {
                     this.state.show ? this.state.text : "hello world"
 
             ]),
-            React.createElement.bind(this)('input', {type: "text", onInput: this.inputChange.bind(this), value: this.state.text, ref: "input"}),
+            React.createElement.bind(this)('input', {type: "text", onInput: this.inputChange, value: this.state.text, ref: "input"}),
             React.createElement.bind(this)('button', {onClick: this.btnClick}, ["修改"])
         ]))
     }
+}
+
+class Button extends React.Component {
+  render() {
+    return (
+      React.createElement.bind(this)('button', null, [this.props.text || '确定'])
+    )
+  }
 }
 
 // 项目入口文件
@@ -317,7 +377,8 @@ class App extends React.Component {
       loading: true,
       title: '测试',
       mode: 'normal',
-      logo: "/logo.png"
+      logo: "/logo.png",
+      btnText: '确定'
     };
   }
   componentDidMount (props) {
@@ -328,13 +389,30 @@ class App extends React.Component {
       });
     }, 5000);
   }
+  buttonClick (...rest) {
+    console.log(this, rest);
+    return (...args) => {
+      console.log(this, args);
+    }
+  }
   render() {
     return (React.createElement.bind(this)('span', null, [
       React.createElement.bind(this)('header', null, [
         React.createComponent.call(this, Nav)({logo: this.state.logo, className: "nav"})
       ]),
       React.createElement.bind(this)('main', {className: this.state.mode}, [
-        React.createElement.bind(this)('div', null, [this.state.title])
+        React.createElement.bind(this)('div', null, [this.state.title]),
+
+          Array(50).fill('').map((item, index) => {
+            return (
+              React.createElement.bind(this)('div', null, [
+                React.createElement.bind(this)('div', {onClick: this.buttonClick}, ["1111"]),
+                React.createComponent.call(this, Button)({text: Math.random().toString(36).slice(8), onClick: (e) => this.buttonClick(e, 123)}),
+                React.createComponent.call(this, Button)({text: Math.random().toString(36).slice(8), onClick: this.buttonClick.bind(this, 123)})
+              ])
+            )
+          })
+
       ])
     ]))
   }

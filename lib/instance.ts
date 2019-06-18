@@ -39,7 +39,7 @@ export const destroy = (instance: AnyObject) => {
         }
     }
 }
-export const bindEvent = (instance: AnyObject, _events: AnyObject) => {
+export const connectEvent = (instance: AnyObject, _events: AnyObject) => {
     events = _events;
 }
 export const bindRef = (instance: AnyObject, handler: any, node: HTMLElement) => {
@@ -53,25 +53,31 @@ export const bindRef = (instance: AnyObject, handler: any, node: HTMLElement) =>
         }
     }
 }
-export const bindAttribute = (instance: AnyObject, node: HTMLElement, props: AnyObject | null) => {
+export const bindAttribute = (instance: AnyObject, node: HTMLElement, props: AnyObject | null, child?: AnyObject) => {
+    let bindData: any[] = [];
     if (props instanceof Object) {
         for(let key in props) {
+            bindData.push({
+                key, 
+                value: props[key]
+            });
             if (/^on[A-Z].*$/.test(key)) {
-                events.bindEvent(instance, node,  key.toLowerCase(), props[key])
+                events.bindEvent(instance, node,  key.toLowerCase(), props[key], child);
             } else if (key === 'className'){
-                node.setAttribute('class', props[key])
+                node.setAttribute('class', props[key]);
             } else if(key === 'ref'){
                 bindRef(instance, props[key], node);
             } else {
-                node.setAttribute(key, props[key])
+                node.setAttribute(key, props[key]);
             }
         }
     }
+    return bindData;
 }
 export default {
     diff,
     destroy,
-    bindEvent,
+    connectEvent,
     bindRef,
     bindAttribute,
     componentUpdate,
