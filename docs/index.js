@@ -318,102 +318,27 @@ var React = {
 
 // import React from 'ks-react';
 
-class Nav extends React.Component {
-    constructor() {
-        super();
-        this.shouldUpdate = true;
-        this.state = {
-            text: '12345',
-            show: false,
-        };
-    }
-    shouldComponentUpdate(props) {
-        return this.shouldUpdate;
-    }
-    inputChange(e) {
-        this.shouldUpdate = false;
-        this.setState({
-            text: e.target.value
-        });
-    }
-    btnClick() {
-        this.shouldUpdate = true;
-        this.setState({
-            show: true
-        });
-    }
-    componentDidMount() {
-    }
-    render() {
-        return (React.createElement.bind(this)('nav', {className: "test"}, [
-            this.props.logo,
-            React.createElement.bind(this)('span', null, [
-
-                    this.state.show ? this.state.text : "hello world"
-
-            ]),
-            React.createElement.bind(this)('input', {type: "text", onInput: this.inputChange, value: this.state.text, ref: "input"}),
-            React.createElement.bind(this)('button', {onClick: this.btnClick}, ["修改"])
-        ]))
-    }
-}
-
-class Button extends React.Component {
+class Header extends React.Component {
+  constructor() {
+    super();
+  }
   render() {
     return (
-      React.createElement.bind(this)('button', null, [this.props.text || '确定'])
+      React.createElement.bind(this)('header', null, [
+        "header"
+      ])
     )
   }
 }
 
-// 项目入口文件
-
 class App extends React.Component {
   constructor() {
     super();
-    console.log(this);
-    this.state = {
-      loading: true,
-      title: '测试',
-      mode: 'normal',
-      logo: "/logo.png",
-      btnText: '确定'
-    };
-  }
-  componentDidMount (props) {
-    setTimeout(() => {
-      this.setState({
-        title: 'hello world!',
-        loading: false
-      });
-    }, 5000);
-  }
-  buttonClick (...rest) {
-    console.log(this, rest);
-    return (...args) => {
-      console.log(this, args);
-    }
   }
   render() {
-    return (React.createElement.bind(this)('span', null, [
-      React.createElement.bind(this)('header', null, [
-        React.createComponent.call(this, Nav)({logo: this.state.logo, className: "nav"})
-      ]),
-      React.createElement.bind(this)('main', {className: this.state.mode}, [
-        React.createElement.bind(this)('div', null, [this.state.title]),
-
-          Array(50).fill('').map((item, index) => {
-            return (
-              React.createElement.bind(this)('div', null, [
-                React.createElement.bind(this)('div', {onClick: this.buttonClick}, ["1111"]),
-                React.createComponent.call(this, Button)({text: Math.random().toString(36).slice(8), onClick: (e) => this.buttonClick(e, 123)}),
-                React.createComponent.call(this, Button)({text: Math.random().toString(36).slice(8), onClick: this.buttonClick.bind(this, 123)})
-              ])
-            )
-          })
-
-      ])
-    ]))
+    return (
+      React.createComponent.call(this, Header)()
+    )
   }
 }
 

@@ -1,8 +1,8 @@
 {
   "name": "ks-react",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "实现一个简单的react",
-  "main": "lib/react.min.js",
+  "main": "lib/react/react.min.js",
   "keywords": [
     "react",
     "demo",
@@ -14,7 +14,7 @@
     "build": "npm run source && npm run server",
     "server": "rollup -c -i server/main.jsx -o server/main.js && node server/main.js",
     "source": "rollup -c -i src/main.jsx -o docs/index.js && npm run browserify",
-    "react": "rollup -c -i lib/react.ts -o lib/react.min.js",
+    "react": "rollup -c -i lib/react/index.ts -o lib/react/react.min.js",
     "prepublishOnly": "npm run react",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
