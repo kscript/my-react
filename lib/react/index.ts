@@ -107,15 +107,15 @@ export class Component {
 export const React: AnyObject = {
     Component,
     // this指向父组件
-    createComponent (Component: any) {
-        let instance = this.components[this.indicator++];
-        if (!instance) {
-            instance = new Component();
-            instance.parent = this;
-            this.components.push(instance);
-        }
+    createComponent (Component: any, ...rest: any[]) {
+        // this.constructor = Component;
         return (props: AnyObject, config: AnyObject | null, children: any[]) => {
-            instance.props = props;
+            let instance = this.components[this.indicator++];
+            if (!instance) {
+                instance = new Component(props);
+                instance.parent = this;
+                this.components.push(instance);
+            }
             let newInstance = componentUpdate(instance)
             let vdom = newInstance.vdom;
             vdom.bindData = bindAttribute(this, vdom.node, props, instance);
