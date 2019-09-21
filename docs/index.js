@@ -92,7 +92,11 @@ var bindAttribute = function (instance, node, props, child) {
                 key: key,
                 value: props[key]
             });
-            if (/^on[A-Z].*$/.test(key)) {
+            if (key === 'defaultValue' && /input|textarea/i.test(node.tagName)) {
+                // @ts-ignore
+                node.value = props[key];
+            }
+            else if (/^on[A-Z].*$/.test(key)) {
                 events.bindEvent(instance, node, key.toLowerCase(), props[key], child);
             }
             else if (key === 'className') {
@@ -377,7 +381,7 @@ class Index extends React.Component {
       React.createElement.bind(this)('div', {id: "react-test", class: "page"}, [
         React.createComponent.call(this, Header)({logo: "", name: "测试"}),
         /* <Nav></Nav> */
-        React.createElement.bind(this)('input', {type: "text", onChange: this.inputChange}),
+        React.createElement.bind(this)('input', {type: "text", onChange: this.inputChange, defaultValue: this.state.title}),
         React.createElement.bind(this)('div', {className: "main"}, [
           Array(5).fill('').map((item, index) => {
             return (

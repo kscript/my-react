@@ -53,7 +53,7 @@ export const bindRef = (instance: AnyObject, handler: any, node: HTMLElement) =>
         }
     }
 }
-export const bindAttribute = (instance: AnyObject, node: HTMLElement, props: AnyObject | null, child?: AnyObject) => {
+export const bindAttribute = (instance: AnyObject, node: HTMLElement | HTMLInputElement, props: AnyObject | null, child?: AnyObject) => {
     let bindData: any[] = [];
     if (props instanceof Object) {
         for(let key in props) {
@@ -61,7 +61,10 @@ export const bindAttribute = (instance: AnyObject, node: HTMLElement, props: Any
                 key, 
                 value: props[key]
             });
-            if (/^on[A-Z].*$/.test(key)) {
+            if (key ==='defaultValue' && /input|textarea/i.test(node.tagName)) {
+                // @ts-ignore
+                node.value = props[key];
+            } else if (/^on[A-Z].*$/.test(key)) {
                 events.bindEvent(instance, node,  key.toLowerCase(), props[key], child);
             } else if (key === 'className'){
                 node.setAttribute('class', props[key]);

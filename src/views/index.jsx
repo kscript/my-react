@@ -23,7 +23,7 @@ export default class Index extends React.Component {
       <div id="react-test" class="page">
         <Header logo="" name="测试"></Header>
         {/* <Nav></Nav> */}
-        <input type="text" onChange={this.inputChange}/>
+        <input type="text" onChange={this.inputChange} defaultValue={this.state.title}/>
         <div className="main">
           {Array(5).fill('').map((item, index) => {
             return (
