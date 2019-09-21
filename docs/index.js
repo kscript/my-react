@@ -210,9 +210,7 @@ var Component = /** @class */ (function () {
         if (!oldNode) {
             execFunc(this, 'componentWillMount')(this.props);
         }
-        execFunc(this, 'componentWillUpdate')(this.props);
         this.vdom = diff(this.vdom, this.render());
-        execFunc(this, 'componentDidUpdate')(this.props);
         if (oldNode) {
             node && node.replaceChild(this.vdom.node, oldNode);
         }
@@ -246,14 +244,22 @@ var React = {
         }
         // this.constructor = Component;
         return function (props, config, children) {
+            var vdom;
+            var newInstance;
             var instance = _this.components[_this.indicator++];
             if (!instance) {
                 instance = new Component(props);
                 instance.parent = _this;
                 _this.components.push(instance);
+                newInstance = componentUpdate(instance);
             }
-            var newInstance = componentUpdate(instance);
-            var vdom = newInstance.vdom;
+            else {
+                execFunc(instance, 'componentWillUpdate')(props);
+                instance.props = props;
+                newInstance = componentUpdate(instance);
+                execFunc(instance, 'componentDidUpdate')(props);
+            }
+            vdom = newInstance.vdom;
             vdom.bindData = bindAttribute(_this, vdom.node, props, instance);
             vdom.parent = _this.vdom;
             return vdom;
@@ -325,7 +331,12 @@ var React = {
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    console.log(this, arguments);
+  }
+  componentWillUpdate (props){
+    console.log('componentWillUpdate', props);
+  }
+  componentDidUpdate (props){
+    console.log('componentDidUpdate', props);
   }
   render() {
     return (
@@ -334,47 +345,10 @@ class Header extends React.Component {
   }
 }
 
-class Nav extends React.Component {
-    constructor() {
-        super();
-        this.shouldUpdate = true;
-        this.state = {
-            text: '12345',
-            show: false,
-        };
-    }
-    shouldComponentUpdate(props) {
-        return this.shouldUpdate;
-    }
-    inputChange(e) {
-        this.shouldUpdate = false;
-        this.setState({
-            text: e.target.value
-        });
-    }
-    btnClick() {
-        this.shouldUpdate = true;
-        this.setState({
-            show: true
-        });
-    }
-    componentDidMount() {
-    }
-    render() {
-        return (React.createElement.bind(this)('nav', {className: "test"}, [
-            this.props.logo,
-            React.createElement.bind(this)('span', null, [
-
-                    this.state.show ? this.state.text : "hello world"
-
-            ]),
-            React.createElement.bind(this)('input', {type: "text", onInput: this.inputChange, value: this.state.text, ref: "input"}),
-            React.createElement.bind(this)('button', {onClick: this.btnClick}, ["修改"])
-        ]))
-    }
-}
-
 class Button extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
     return (
       React.createElement.bind(this)('button', null, [this.props.text || '确定'])
@@ -385,21 +359,31 @@ class Button extends React.Component {
 class Index extends React.Component {
   constructor() {
     super();
+    this.state = {
+      title: '按钮'
+    };
+    window.app = this;
   }
   buttonClick (text) {
     console.log(this, text);
+  }
+  inputChange (event) {
+    this.setState({
+      title: event.target.value
+    });
   }
   render() {
     return (
       React.createElement.bind(this)('div', {id: "react-test", class: "page"}, [
         React.createComponent.call(this, Header)({logo: "", name: "测试"}),
-        React.createComponent.call(this, Nav)(),
+        /* <Nav></Nav> */
+        React.createElement.bind(this)('input', {type: "text", onChange: this.inputChange}),
         React.createElement.bind(this)('div', {className: "main"}, [
           Array(5).fill('').map((item, index) => {
             return (
               index % 2
-              ? React.createComponent.call(this, Button)({text: '按钮'  + -~index, onClick: this.buttonClick.bind(this, '传递参数')})
-              : React.createComponent.call(this, Button)({text: '按钮' + -~index, onClick: this.buttonClick})
+              ? React.createComponent.call(this, Button)({text: this.state.title + -~index, onClick:  this.buttonClick.bind(this, '传递参数') })
+              : React.createComponent.call(this, Button)({text: this.state.title + -~index, onClick:  this.buttonClick})
             )
           })
         ])

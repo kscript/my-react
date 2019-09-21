@@ -81,9 +81,7 @@ export class Component {
         if (!oldNode) {
             execFunc(this, 'componentWillMount')(this.props);
         }
-        execFunc(this, 'componentWillUpdate')(this.props);
         this.vdom = diff(this.vdom, this.render());
-        execFunc(this, 'componentDidUpdate')(this.props);
         if (oldNode) {
             node && node.replaceChild(this.vdom.node, oldNode);
         } else {
@@ -110,14 +108,21 @@ export const React: AnyObject = {
     createComponent (Component: any, ...rest: any[]) {
         // this.constructor = Component;
         return (props: AnyObject, config: AnyObject | null, children: any[]) => {
+            let vdom;
+            let newInstance;
             let instance = this.components[this.indicator++];
             if (!instance) {
                 instance = new Component(props);
                 instance.parent = this;
                 this.components.push(instance);
+                newInstance = componentUpdate(instance);
+            } else {
+                execFunc(instance, 'componentWillUpdate')(props);
+                instance.props = props;
+                newInstance = componentUpdate(instance);
+                execFunc(instance, 'componentDidUpdate')(props);
             }
-            let newInstance = componentUpdate(instance)
-            let vdom = newInstance.vdom;
+            vdom = newInstance.vdom;
             vdom.bindData = bindAttribute(this, vdom.node, props, instance);
             vdom.parent = this.vdom;
             return vdom;
