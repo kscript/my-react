@@ -1,12 +1,12 @@
 import React from '@/react';
-import Header from '@/components/header';
+import Index from '@/views';
 export default class App extends React.Component {
   constructor() {
     super();
   }
   render() {
     return (
-      <Header></Header>
+      <Index />
     )
   }
 }

@@ -1,13 +1,12 @@
 import React from '@/react';
 export default class Header extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    console.log(this, arguments);
   }
   render() {
     return (
-      <header>
-        header
-      </header>
+      <header>React测试</header>
     )
   }
 }

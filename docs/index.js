@@ -240,14 +240,18 @@ var React = {
     // this指向父组件
     createComponent: function (Component) {
         var _this = this;
-        var instance = this.components[this.indicator++];
-        if (!instance) {
-            instance = new Component();
-            instance.parent = this;
-            this.components.push(instance);
+        var rest = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            rest[_i - 1] = arguments[_i];
         }
+        // this.constructor = Component;
         return function (props, config, children) {
-            instance.props = props;
+            var instance = _this.components[_this.indicator++];
+            if (!instance) {
+                instance = new Component(props);
+                instance.parent = _this;
+                _this.components.push(instance);
+            }
             var newInstance = componentUpdate(instance);
             var vdom = newInstance.vdom;
             vdom.bindData = bindAttribute(_this, vdom.node, props, instance);
@@ -319,13 +323,86 @@ var React = {
 // import React from 'ks-react';
 
 class Header extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    console.log(this, arguments);
   }
   render() {
     return (
-      React.createElement.bind(this)('header', null, [
-        "header"
+      React.createElement.bind(this)('header', null, ["React测试"])
+    )
+  }
+}
+
+class Nav extends React.Component {
+    constructor() {
+        super();
+        this.shouldUpdate = true;
+        this.state = {
+            text: '12345',
+            show: false,
+        };
+    }
+    shouldComponentUpdate(props) {
+        return this.shouldUpdate;
+    }
+    inputChange(e) {
+        this.shouldUpdate = false;
+        this.setState({
+            text: e.target.value
+        });
+    }
+    btnClick() {
+        this.shouldUpdate = true;
+        this.setState({
+            show: true
+        });
+    }
+    componentDidMount() {
+    }
+    render() {
+        return (React.createElement.bind(this)('nav', {className: "test"}, [
+            this.props.logo,
+            React.createElement.bind(this)('span', null, [
+
+                    this.state.show ? this.state.text : "hello world"
+
+            ]),
+            React.createElement.bind(this)('input', {type: "text", onInput: this.inputChange, value: this.state.text, ref: "input"}),
+            React.createElement.bind(this)('button', {onClick: this.btnClick}, ["修改"])
+        ]))
+    }
+}
+
+class Button extends React.Component {
+  render() {
+    return (
+      React.createElement.bind(this)('button', null, [this.props.text || '确定'])
+    )
+  }
+}
+
+class Index extends React.Component {
+  constructor() {
+    super();
+  }
+  buttonClick (text) {
+    console.log(this, text);
+  }
+  render() {
+    return (
+      React.createElement.bind(this)('div', {id: "react-test", class: "page"}, [
+        React.createComponent.call(this, Header)({logo: "", name: "测试"}),
+        React.createComponent.call(this, Nav)(),
+        React.createElement.bind(this)('div', {className: "main"}, [
+          Array(5).fill('').map((item, index) => {
+            return (
+              index % 2
+              ? React.createComponent.call(this, Button)({text: '按钮'  + -~index, onClick: this.buttonClick.bind(this, '传递参数')})
+              : React.createComponent.call(this, Button)({text: '按钮' + -~index, onClick: this.buttonClick})
+            )
+          })
+        ])
       ])
     )
   }
@@ -337,7 +414,7 @@ class App extends React.Component {
   }
   render() {
     return (
-      React.createComponent.call(this, Header)()
+      React.createComponent.call(this, Index)()
     )
   }
 }
