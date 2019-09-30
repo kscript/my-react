@@ -11,7 +11,7 @@ export default class Header extends React.Component {
   }
   render() {
     return (
-      <header>React测试</header>
+      <header>{this.props.title}</header>
     )
   }
 }

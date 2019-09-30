@@ -345,7 +345,7 @@ class Header extends React.Component {
   }
   render() {
     return (
-      React.createElement.bind(this)('header', null, ["React测试"])
+      React.createElement.bind(this)('header', null, [this.props.title])
     )
   }
 }
@@ -365,7 +365,8 @@ class Index extends React.Component {
   constructor() {
     super();
     this.state = {
-      title: '按钮'
+      title: '按钮',
+      input: null
     };
     window.app = this;
   }
@@ -373,22 +374,28 @@ class Index extends React.Component {
     console.log(this, text);
   }
   inputChange (event) {
+    // this.setState({
+    //   title: event.target.value
+    // })
+  }
+  submitChange(){
     this.setState({
-      title: event.target.value
+      title: this.input.value
     });
   }
+
   render() {
     return (
       React.createElement.bind(this)('div', {id: "react-test", class: "page"}, [
-        React.createComponent.call(this, Header)({logo: "", name: "测试"}),
-        /* <Nav></Nav> */
-        React.createElement.bind(this)('input', {type: "text", onChange: this.inputChange, defaultValue: this.state.title}),
+        React.createComponent.call(this, Header)({logo: "", title: "功能测试"}),
+        "按钮名前缀: ", React.createElement.bind(this)('input', {type: "text", ref: (input) => this.input = input, onChange: this.inputChange, defaultValue: this.state.title}),
+        React.createComponent.call(this, Button)({text: "确定", onClick: this.submitChange}),
         React.createElement.bind(this)('div', {className: "main"}, [
           Array(5).fill('').map((item, index) => {
             return (
               index % 2
-              ? React.createComponent.call(this, Button)({text: this.state.title + -~index, onClick:  this.buttonClick.bind(this, '传递参数') })
-              : React.createComponent.call(this, Button)({text: this.state.title + -~index, onClick:  this.buttonClick})
+              ? React.createComponent.call(this, Button)({text: this.state.title + ': ' + -~index, onClick:  this.buttonClick.bind(this, '传递参数') })
+              : React.createComponent.call(this, Button)({text: this.state.title + ': ' + -~index, onClick:  this.buttonClick})
             )
           })
         ])
